@@ -1,0 +1,36 @@
+{
+    "name": "apt/social-feeds",
+    "description": "Utilizes json api to get latest social feeds",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "social feeds"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thomas Sømoen",
+            "homepage": "https://apt.no/"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1",
+        "guzzlehttp/oauth-subscriber": "^0.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "apt\\socialfeeds\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Social feeds",
+        "handle": "apt-social-feeds",
+        "hasCpSettings": true,
+        "hasCpSection": false,
+        "class": "apt\\socialfeeds\\SocialFeeds"
+    }
+}

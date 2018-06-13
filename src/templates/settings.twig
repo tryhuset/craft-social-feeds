@@ -1,0 +1,249 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Social feeds plugin for Craft CMS 3.x
+ *
+ * Social feeds Settings.twig
+ *
+ * @author    Thomas Sømoen
+ * @copyright Copyright (c) 2018 Thomas Sømoen
+ * @link      https://apt.no/
+ * @package   SocialFeeds
+ * @since     1.0.0
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("apt\\socialfeeds\\assetbundles\\socialfeeds\\SocialFeedsAsset") %}
+
+<fieldset id="tab-facebook">
+    <h2>Facebook</h2>
+    {{ forms.LightswitchField({
+        label: 'On'|t,
+        instructions: 'Enter some setting here.',
+        id: 'facebook-on',
+        name: 'facebookOn',
+        value: true,
+        on: settings['facebookOn'],
+        errors: settings.getErrors('facebookOn'),
+    }) }}
+    {{ forms.textField({
+        label: 'Access token',
+        instructions: 'Enter some setting here.',
+        id: 'facebook-access-token',
+        name: 'facebookAccessToken',
+        value: settings['facebookAccessToken'],
+        errors: settings.getErrors('facebookAccessToken'),
+    }) }}
+    {{ forms.textField({
+        label: 'Page id',
+        instructions: 'Enter some setting here.',
+        id: 'facebook-page-id',
+        name: 'facebookPageId',
+        value: settings['facebookPageId'],
+        errors: settings.getErrors('facebookPageId'),
+    }) }}
+    {% if
+        settings.hasErrors('facebookOn') or
+        settings.hasErrors('facebookAccessToken') or
+        settings.hasErrors('facebookPageId')
+    %}
+        <script>
+            (function() {
+                var tabs = document.getElementById('tabs');
+                var tab = tabs.querySelector('a[href="#settings-tab-facebook"]');
+                if (tab) {
+                    tab.click();
+                }
+            })();
+        </script>
+    {% endif %}
+</fieldset>
+
+<fieldset id="tab-youtube" class="hidden">
+    <h2>Youtube</h2>
+    {{ forms.LightswitchField({
+        label: 'On'|t,
+        instructions: 'Enter some setting here.',
+        id: 'youtube-on',
+        name: 'youtubeOn',
+        value: true,
+        on: settings['youtubeOn'],
+        errors: settings.getErrors('youtubeOn'),
+    }) }}
+    {{ forms.textField({
+        label: 'Channel',
+        instructions: 'Enter some setting here.',
+        id: 'youtube-channel',
+        name: 'youtubeChannel',
+        value: settings['youtubeChannel'],
+        errors: settings.getErrors('youtubeChannel'),
+    }) }}
+    {{ forms.textField({
+        label: 'Key',
+        instructions: 'Enter some setting here.',
+        id: 'youtube-key',
+        name: 'youtubeKey',
+        value: settings['youtubeKey'],
+        errors: settings.getErrors('youtubeKey'),
+    }) }}
+    {% if
+        settings.hasErrors('youtubeOn') or
+        settings.hasErrors('youtubeChannel') or
+        settings.hasErrors('youtubeKey')
+    %}
+        <script>
+            (function() {
+                var tabs = document.getElementById('tabs');
+                var tab = tabs.querySelector('a[href="#settings-tab-youtube"]');
+                if (tab) {
+                    tab.click();
+                }
+            })();
+        </script>
+    {% endif %}
+</fieldset>
+
+<fieldset id="tab-twitter" class="hidden">
+    <h2>Twitter</h2>
+    {{ forms.LightswitchField({
+        label: 'On'|t,
+        instructions: 'Enter some setting here.',
+        id: 'twitter-on',
+        name: 'twitterOn',
+        value: true,
+        on: settings['twitterOn'],
+        errors: settings.getErrors('twitterOn'),
+    }) }}
+    {{ forms.textField({
+        label: 'Consumer key',
+        instructions: 'Enter some setting here.',
+        id: 'twitter-consumer-key',
+        name: 'twitterConsumerKey',
+        value: settings['twitterConsumerKey'],
+        errors: settings.getErrors('twitterConsumerKey'),
+    }) }}
+    {{ forms.textField({
+        label: 'Consumer secret',
+        instructions: 'Enter some setting here.',
+        id: 'twitter-consumer-secret',
+        name: 'twitterConsumerSecret',
+        value: settings['twitterConsumerSecret'],
+        errors: settings.getErrors('twitterConsumerSecret'),
+    }) }}
+    {{ forms.textField({
+        label: 'Token',
+        instructions: 'Enter some setting here.',
+        id: 'twitter-token',
+        name: 'twitterToken',
+        value: settings['twitterToken'],
+        errors: settings.getErrors('twitterToken'),
+    }) }}
+    {{ forms.textField({
+        label: 'Token secret',
+        instructions: 'Enter some setting here.',
+        id: 'twitter-token-secret',
+        name: 'twitterTokenSecret',
+        value: settings['twitterTokenSecret'],
+        errors: settings.getErrors('twitterTokenSecret'),
+    }) }}
+    {{ forms.textField({
+        label: 'Screen name',
+        instructions: 'Enter some setting here.',
+        id: 'twitter-screen-name',
+        name: 'twitterScreenName',
+        value: settings['twitterScreenName'],
+        errors: settings.getErrors('twitterScreenName'),
+    }) }}
+    {% if
+        settings.hasErrors('twitterOn') or
+        settings.hasErrors('twitterConsumerKey') or
+        settings.hasErrors('twitterConsumerSecret') or
+        settings.hasErrors('twitterToken') or
+        settings.hasErrors('twitterTokenSecret') or
+        settings.hasErrors('twitterScreenName')
+    %}
+        <script>
+            (function() {
+                var tabs = document.getElementById('tabs');
+                var tab = tabs.querySelector('a[href="#settings-tab-twitter"]');
+                if (tab) {
+                    tab.click();
+                }
+            })();
+        </script>
+    {% endif %}
+</fieldset>
+
+<fieldset id="tab-instagram" class="hidden">
+    <h2>Instagram</h2>
+    {{ forms.LightswitchField({
+        label: 'On'|t,
+        instructions: 'Enter some setting here.',
+        id: 'instagram-on',
+        name: 'instagramOn',
+        value: true,
+        on: settings['instagramOn'],
+        errors: settings.getErrors('instagramOn'),
+    }) }}
+    {{ forms.textField({
+        label: 'Id',
+        instructions: 'Enter some setting here.',
+        id: 'instagram-id',
+        name: 'instagramId',
+        value: settings['instagramId'],
+        errors: settings.getErrors('instagramId'),
+    }) }}
+    {{ forms.textField({
+        label: 'Token',
+        instructions: 'Enter some setting here.',
+        id: 'instagram-token',
+        name: 'instagramToken',
+        value: settings['instagramToken'],
+        errors: settings.getErrors('instagramToken'),
+    }) }}
+    {% if settings.hasErrors('instagramOn') or settings.hasErrors('instagramId') or settings.hasErrors('instagramToken') %}
+        <script>
+            (function() {
+                var tabs = document.getElementById('tabs');
+                var tab = tabs.querySelector('a[href="#settings-tab-instagram"]');
+                if (tab) {
+                    tab.click();
+                }
+            })();
+        </script>
+    {% endif %}
+</fieldset>
+
+<fieldset id="tab-flickr" class="hidden">
+    <h2>Flickr</h2>
+    {{ forms.LightswitchField({
+        label: 'On'|t,
+        instructions: 'Enter some setting here.',
+        id: 'flickr-on',
+        name: 'flickrOn',
+        value: true,
+        on: settings['flickrOn'],
+        errors: settings.getErrors('flickrOn'),
+    }) }}
+    {{ forms.textField({
+        label: 'Id',
+        instructions: 'Enter some setting here.',
+        id: 'flickr-id',
+        name: 'flickrId',
+        value: settings['flickrId'],
+        errors: settings.getErrors('flickrId'),
+    }) }}
+    {% if settings.hasErrors('flickrId') or settings.hasErrors('flickrOn') %}
+        <script>
+            (function() {
+                var tabs = document.getElementById('tabs');
+                var tab = tabs.querySelector('a[href="#settings-tab-flickr"]');
+                if (tab) {
+                    tab.click();
+                }
+            })();
+        </script>
+    {% endif %}
+</fieldset>
