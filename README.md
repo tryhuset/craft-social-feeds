@@ -16,11 +16,21 @@ To install the plugin, follow these instructions.
 
         cd /path/to/project
 
-2. Then tell Composer to load the plugin:
+2. Add the following to `composer.json`
+```
+"repositories": [
+    {
+      "type": "vcs",
+      "url": "https://git1.apt.no/open/craft-twig.git"
+    }
+  ],
+```
+
+3. Then tell Composer to load the plugin:
 
         composer require apt/social-feeds
 
-3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Social feeds.
+4. In the Control Panel, go to Settings → Plugins and click the “Install” button for Social feeds.
 
 ## Social feeds Overview
 
