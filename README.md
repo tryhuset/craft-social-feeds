@@ -21,7 +21,7 @@ To install the plugin, follow these instructions.
 "repositories": [
     {
       "type": "vcs",
-      "url": "https://git1.apt.no/open/craft-twig.git"
+      "url": "https://git1.apt.no/open/craft-social-feeds.git"
     }
   ],
 ```
