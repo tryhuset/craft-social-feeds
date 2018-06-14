@@ -2,8 +2,6 @@
 
 Utilizes json api to get latest social feeds
 
-![Screenshot](resources/img/plugin-logo.png)
-
 ## Requirements
 
 This plugin requires Craft CMS 3.0.0-beta.23 or later.
@@ -28,26 +26,55 @@ To install the plugin, follow these instructions.
 
 3. Then tell Composer to load the plugin:
 
-        composer require apt/social-feeds
+        composer require apt/craft-social-feeds
 
 4. In the Control Panel, go to Settings → Plugins and click the “Install” button for Social feeds.
 
 ## Social feeds Overview
 
--Insert text here-
+Adds api to fetch social feeds as JSON.
+
+The plugin can feed from
+* Facebook
+* Youtube
+* Instagram
+* Twitter
+* Flickr
+
+The individual feeds must be activated through the plugin settings.
+
+All credetials is registered in the plugin settings.
 
 ## Configuring Social feeds
 
--Insert text here-
+If you need to disable/hide some services in admin, add a file named apt-social-feeds.php to your craft config folder.
+
+Add following code to the file:
+
+```
+<?php
+return [
+    'facebook' => true,
+    'youtube' => false,
+    'twitter' => false,
+    'instagram' => true,
+    'flickr' => false,
+];
+```
+
+Set the service you want to disable to false.
 
 ## Using Social feeds
 
--Insert text here-
+When activated the feeds can be accessed by the following url:
 
-## Social feeds Roadmap
+* /actions/apt-social-feeds/facebook
+* /actions/apt-social-feeds/youtube
+* /actions/apt-social-feeds/instagram
+* /actions/apt-social-feeds/twitter
+* /actions/apt-social-feeds/flickr
 
-Some things to do, and ideas for potential features:
-
-* Release it
+The feeds has a default limit of 6.
+If you need more add ?limit=[your limit] to the query string
 
 Brought to you by [Thomas Sømoen](https://apt.no/)
