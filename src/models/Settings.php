@@ -25,6 +25,12 @@ class Settings extends Model
     // Public Properties
     // =========================================================================
 
+    public $facebook = true;
+    public $youtube = true;
+    public $twitter = true;
+    public $instagram = true;
+    public $flickr = true;
+
     /**
      * @var string
      */
@@ -44,7 +50,9 @@ class Settings extends Model
     public $instagramToken = '';
 
     public $youtubeOn = false;
+    public $youtubeType = 'playlist';
     public $youtubeChannel = '';
+    public $youtubePlaylist = '';
     public $youtubeKey = '';
 
     public $facebookOn = false;
@@ -56,6 +64,9 @@ class Settings extends Model
 
     protected function getTwitterRules()
     {
+        if (!$this->twitter) {
+            return [];
+        }
         $rules = [
             ['twitterOn', 'boolean'],
             ['twitterOn', 'default', 'value' => false],
@@ -75,6 +86,9 @@ class Settings extends Model
 
     protected function getflickrRules()
     {
+        if (!$this->flickr) {
+            return [];
+        }
         $rules = [
             ['flickrOn', 'boolean'],
             ['flickrOn', 'default', 'value' => false],
@@ -93,6 +107,9 @@ class Settings extends Model
 
     protected function getInstagramRules()
     {
+        if (!$this->instagram) {
+            return [];
+        }
         $rules = [
             ['instagramOn', 'boolean'],
             ['instagramOn', 'default', 'value' => false],
@@ -114,9 +131,17 @@ class Settings extends Model
 
     protected function getYoutubeRules()
     {
+        if (!$this->youtube) {
+            return [];
+        }
+
         $rules = [
             ['youtubeOn', 'boolean'],
             ['youtubeOn', 'default', 'value' => false],
+            ['youtubeType', 'string'],
+            ['youtubeType', 'default', 'value' => 'playlist'],
+            ['youtubePlaylist', 'string'],
+            ['youtubePlaylist', 'default', 'value' => ''],
             ['youtubeChannel', 'string'],
             ['youtubeChannel', 'default', 'value' => ''],
             ['youtubeKey', 'string'],
@@ -125,9 +150,19 @@ class Settings extends Model
 
         if ($this->youtubeOn) {
             $rules = array_merge($rules, [
-                ['youtubeChannel', 'required'],
+                ['youtubeType', 'required'],
                 ['youtubeKey', 'required'],
             ]);
+
+            if ($this->youtubeType === 'playlist') {
+                $rules = array_merge($rules, [
+                    ['youtubePlaylist', 'required'],
+                ]);
+            } else {
+                $rules = array_merge($rules, [
+                    ['youtubeChannel', 'required'],
+                ]);
+            }
         }
 
         return $rules;
@@ -135,6 +170,9 @@ class Settings extends Model
 
     protected function getFacebookRules()
     {
+        if (!$this->facebook) {
+            return [];
+        }
         $rules = [
             ['facebookOn', 'boolean'],
             ['facebookOn', 'default', 'value' => false],
@@ -159,12 +197,16 @@ class Settings extends Model
      */
     public function rules()
     {
+        $global = [
+            [['facebook', 'youtube', 'instagram', 'flickr'], 'boolean'],
+            [['facebook', 'youtube', 'instagram', 'flickr'], 'default', 'value' => false],
+        ];
         $twitter = $this->getTwitterRules();
         $flickr = $this->getflickrRules();
         $instagram = $this->getInstagramRules();
         $youtube = $this->getYoutubeRules();
         $facebook = $this->getFacebookRules();
 
-        return array_merge($twitter, $flickr, $instagram, $youtube, $facebook);
+        return array_merge($global, $twitter, $flickr, $instagram, $youtube, $facebook);
     }
 }

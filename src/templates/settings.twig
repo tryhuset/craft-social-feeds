@@ -17,170 +17,281 @@
 
 {% do view.registerAssetBundle("apt\\socialfeeds\\assetbundles\\socialfeeds\\SocialFeedsAsset") %}
 
-<fieldset id="tab-facebook">
-    <h2>Facebook</h2>
-    {{ forms.LightswitchField({
-        label: 'On'|t,
-        instructions: 'Enter some setting here.',
-        id: 'facebook-on',
-        name: 'facebookOn',
-        value: true,
-        on: settings['facebookOn'],
-        errors: settings.getErrors('facebookOn'),
-    }) }}
-    {{ forms.textField({
-        label: 'Access token',
-        instructions: 'Enter some setting here.',
-        id: 'facebook-access-token',
-        name: 'facebookAccessToken',
-        value: settings['facebookAccessToken'],
-        errors: settings.getErrors('facebookAccessToken'),
-    }) }}
-    {{ forms.textField({
-        label: 'Page id',
-        instructions: 'Enter some setting here.',
-        id: 'facebook-page-id',
-        name: 'facebookPageId',
-        value: settings['facebookPageId'],
-        errors: settings.getErrors('facebookPageId'),
-    }) }}
-    {% if
-        settings.hasErrors('facebookOn') or
-        settings.hasErrors('facebookAccessToken') or
-        settings.hasErrors('facebookPageId')
-    %}
+{% if settings.facebook %}
+    <fieldset id="tab-facebook">
+        <h2>Facebook</h2>
+        <p>
+            {{ 'To obtain Facebook Access Token, follow this recipe:'|t('apt-social-feeds') }}<br />
+            <a href="https://smashballoon.com/custom-facebook-feed/access-token/" target="_blank" rel="nofollow noreferrer noopener">Smashballoon: How to get a Facebook Access Token</a>
+        </p>
+        <p>
+            {{ 'To find your page id, follow this recipe:'|t('apt-social-feeds') }}<br />
+            <a href="https://findmyfbid.com/" target="_blank" rel="nofollow noreferrer noopener">Find your Facebook ID</a>
+        </p>
+        {{ forms.LightswitchField({
+            label: 'Activate feed'|t('apt-social-feeds'),
+            id: 'facebook-on',
+            name: 'facebookOn',
+            value: true,
+            on: settings['facebookOn'],
+            errors: settings.getErrors('facebookOn'),
+        }) }}
+        {{ forms.textField({
+            label: 'Access token'|t('apt-social-feeds'),
+            id: 'facebook-access-token',
+            name: 'facebookAccessToken',
+            value: settings['facebookAccessToken'],
+            errors: settings.getErrors('facebookAccessToken'),
+        }) }}
+        {{ forms.textField({
+            label: 'Page id'|t('apt-social-feeds'),
+            id: 'facebook-page-id',
+            name: 'facebookPageId',
+            value: settings['facebookPageId'],
+            errors: settings.getErrors('facebookPageId'),
+        }) }}
+        <div class="field">
+            <strong>{{ 'Url to the feed:'|t('apt-social-feeds') }}</strong> <a href="{{ siteUrl }}actions/apt-social-feeds/facebook" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/facebook</a>
+            <br />
+            <br />
+            <h2>{{ 'Feed:'|t('apt-social-feeds') }}</h2>
+            <p>{{ 'Default limit of feed is 6. Add ?limit={your limit} to the query string to load more'|t('apt-social-feeds') }}</p>
+            <p>
+                <a href="{{ siteUrl }}actions/apt-social-feeds/facebook?limit=8" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/facebook?limit=8</a>
+            </p>
+            <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
+            <div class="feed">
+<pre><code>{{ plugin.facebook.feed(3)|json_encode|json_prettify }}</code></pre>
+            </div>
+        </div>
+        {% if
+            settings.hasErrors('facebookOn') or
+            settings.hasErrors('facebookAccessToken') or
+            settings.hasErrors('facebookPageId')
+        %}
+            <script>
+                (function() {
+                    var tabs = document.getElementById('tabs');
+                    var tab = tabs.querySelector('a[href="#settings-tab-facebook"]');
+                    if (tab) {
+                        tab.click();
+                    }
+                })();
+            </script>
+        {% endif %}
+    </fieldset>
+{% endif %}
+
+{% if settings.youtube %}
+    <fieldset id="tab-youtube" class="hidden">
+        <h2>Youtube</h2>
+        <p>
+            {{ 'To obtain a Youtube Api key, follow this recipe:'|t('apt-social-feeds') }}<br />
+            <a href="https://developers.google.com/youtube/registering_an_application" target="_blank" rel="nofollow noreferrer noopener">YouTube Data API</a>
+        </p>
+        <p>
+            {{ 'Log on to your google account and create api key here'|t('apt-social-feeds') }}<br />
+            <a href="https://console.developers.google.com/apis/dashboard" target="_blank" rel="nofollow noreferrer noopener">Google Api Console</a>
+        </p>
+        {{ forms.LightswitchField({
+            label: 'Activate feed'|t('apt-social-feeds'),
+            id: 'youtube-on',
+            name: 'youtubeOn',
+            value: true,
+            on: settings['youtubeOn'],
+            errors: settings.getErrors('youtubeOn'),
+        }) }}
+        {{ forms.textField({
+            label: 'Api Key'|t('apt-social-feeds'),
+            id: 'youtube-key',
+            name: 'youtubeKey',
+            value: settings['youtubeKey'],
+            errors: settings.getErrors('youtubeKey'),
+        }) }}
+        {{ forms.selectField({
+            label: 'Type'|t('apt-social-feeds'),
+            instructions: 'Do you have a playlist id or a channel id?'|t('apt-social-feeds'),
+            id: 'youtube-type',
+            name: 'youtubeType',
+            options: [
+                { label: 'Playlist', value: 'playlist' },
+                { label: 'Channel', value: 'channel' },
+            ],
+            value: settings['youtubeType'],
+            errors: settings.getErrors('youtubeType'),
+        }) }}
+        <div id="youtube-playlist-container" class="field {% if settings['youtubeType'] != 'playlist' %}hidden{% endif %}">
+            {{ forms.textField({
+                label: 'Playlist id'|t('apt-social-feeds'),
+                id: 'youtube-playlist',
+                name: 'youtubePlaylist',
+                value: settings['youtubePlaylist'],
+                errors: settings.getErrors('youtubePlaylist'),
+            }) }}
+        </div>
+
+        <div id="youtube-channel-container" class="field {% if settings['youtubeType'] != 'channel' %}hidden{% endif %}">
+            {{ forms.textField({
+                label: 'Channel'|t('apt-social-feeds'),
+                instructions: 'Enter some setting here.',
+                id: 'youtube-channel',
+                name: 'youtubeChannel',
+                value: settings['youtubeChannel'],
+                errors: settings.getErrors('youtubeChannel'),
+            }) }}
+        </div>
+        <div class="field">
+            <strong>{{ 'Url to the feed:'|t('apt-social-feeds') }}</strong> <a href="{{ siteUrl }}actions/apt-social-feeds/youtube" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/youtube</a>
+            <br />
+            <br />
+            <h2>{{ 'Feed:'|t('apt-social-feeds') }}</h2>
+            <p>{{ 'Default limit of feed is 6. Add ?limit={your limit} to the query string to load more'|t('apt-social-feeds') }}</p>
+            <p>
+                <a href="{{ siteUrl }}actions/apt-social-feeds/youtube?limit=8" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/youtube?limit=8</a>
+            </p>
+            <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
+            <div class="feed">
+<pre><code>{{ plugin.youtube.feed(3)|json_encode|json_prettify }}</code></pre>
+            </div>
+        </div>
         <script>
             (function() {
-                var tabs = document.getElementById('tabs');
-                var tab = tabs.querySelector('a[href="#settings-tab-facebook"]');
-                if (tab) {
-                    tab.click();
-                }
+                var type = document.getElementById('settings-youtube-type');
+                var playlist = document.getElementById('settings-youtube-playlist-container');
+                var channel = document.getElementById('settings-youtube-channel-container');
+
+                type.addEventListener('change', function(e) {
+                    if (e.target.value === 'playlist') {
+                        playlist.classList.remove('hidden');
+                        channel.classList.add('hidden');
+                    } else {
+                        playlist.classList.add('hidden');
+                        channel.classList.remove('hidden');
+                    }
+                });
             })();
         </script>
-    {% endif %}
-</fieldset>
 
-<fieldset id="tab-youtube" class="hidden">
-    <h2>Youtube</h2>
-    {{ forms.LightswitchField({
-        label: 'On'|t,
-        instructions: 'Enter some setting here.',
-        id: 'youtube-on',
-        name: 'youtubeOn',
-        value: true,
-        on: settings['youtubeOn'],
-        errors: settings.getErrors('youtubeOn'),
-    }) }}
-    {{ forms.textField({
-        label: 'Channel',
-        instructions: 'Enter some setting here.',
-        id: 'youtube-channel',
-        name: 'youtubeChannel',
-        value: settings['youtubeChannel'],
-        errors: settings.getErrors('youtubeChannel'),
-    }) }}
-    {{ forms.textField({
-        label: 'Key',
-        instructions: 'Enter some setting here.',
-        id: 'youtube-key',
-        name: 'youtubeKey',
-        value: settings['youtubeKey'],
-        errors: settings.getErrors('youtubeKey'),
-    }) }}
-    {% if
-        settings.hasErrors('youtubeOn') or
-        settings.hasErrors('youtubeChannel') or
-        settings.hasErrors('youtubeKey')
-    %}
-        <script>
-            (function() {
-                var tabs = document.getElementById('tabs');
-                var tab = tabs.querySelector('a[href="#settings-tab-youtube"]');
-                if (tab) {
-                    tab.click();
-                }
-            })();
-        </script>
-    {% endif %}
-</fieldset>
+        {% if
+            settings.hasErrors('youtubeOn') or
+            settings.hasErrors('youtubeKey') or
+            settings.hasErrors('youtubeType') or
+            settings.hasErrors('youtubePlaylist') or
+            settings.hasErrors('youtubeChannel')
+        %}
+            <script>
+                (function() {
+                    var tabs = document.getElementById('tabs');
+                    var tab = tabs.querySelector('a[href="#settings-tab-youtube"]');
+                    if (tab) {
+                        tab.click();
+                    }
+                })();
+            </script>
+        {% endif %}
+    </fieldset>
+{% endif %}
 
-<fieldset id="tab-twitter" class="hidden">
-    <h2>Twitter</h2>
-    {{ forms.LightswitchField({
-        label: 'On'|t,
-        instructions: 'Enter some setting here.',
-        id: 'twitter-on',
-        name: 'twitterOn',
-        value: true,
-        on: settings['twitterOn'],
-        errors: settings.getErrors('twitterOn'),
-    }) }}
-    {{ forms.textField({
-        label: 'Consumer key',
-        instructions: 'Enter some setting here.',
-        id: 'twitter-consumer-key',
-        name: 'twitterConsumerKey',
-        value: settings['twitterConsumerKey'],
-        errors: settings.getErrors('twitterConsumerKey'),
-    }) }}
-    {{ forms.textField({
-        label: 'Consumer secret',
-        instructions: 'Enter some setting here.',
-        id: 'twitter-consumer-secret',
-        name: 'twitterConsumerSecret',
-        value: settings['twitterConsumerSecret'],
-        errors: settings.getErrors('twitterConsumerSecret'),
-    }) }}
-    {{ forms.textField({
-        label: 'Token',
-        instructions: 'Enter some setting here.',
-        id: 'twitter-token',
-        name: 'twitterToken',
-        value: settings['twitterToken'],
-        errors: settings.getErrors('twitterToken'),
-    }) }}
-    {{ forms.textField({
-        label: 'Token secret',
-        instructions: 'Enter some setting here.',
-        id: 'twitter-token-secret',
-        name: 'twitterTokenSecret',
-        value: settings['twitterTokenSecret'],
-        errors: settings.getErrors('twitterTokenSecret'),
-    }) }}
-    {{ forms.textField({
-        label: 'Screen name',
-        instructions: 'Enter some setting here.',
-        id: 'twitter-screen-name',
-        name: 'twitterScreenName',
-        value: settings['twitterScreenName'],
-        errors: settings.getErrors('twitterScreenName'),
-    }) }}
-    {% if
-        settings.hasErrors('twitterOn') or
-        settings.hasErrors('twitterConsumerKey') or
-        settings.hasErrors('twitterConsumerSecret') or
-        settings.hasErrors('twitterToken') or
-        settings.hasErrors('twitterTokenSecret') or
-        settings.hasErrors('twitterScreenName')
-    %}
-        <script>
-            (function() {
-                var tabs = document.getElementById('tabs');
-                var tab = tabs.querySelector('a[href="#settings-tab-twitter"]');
-                if (tab) {
-                    tab.click();
-                }
-            })();
-        </script>
-    {% endif %}
-</fieldset>
+{% if settings.twitter %}
+    <fieldset id="tab-twitter" class="hidden">
+        <h2>Twitter</h2>
+        <p>
+            {{ 'You have to register an App to obtain the credentials:'|t('apt-social-feeds') }}<br />
+            <a href="https://apps.twitter.com/" target="_blank" rel="nofollow noreferrer noopener">Twitter Apps</a>
+        </p>
+        {{ forms.LightswitchField({
+            label: 'Activate feed'|t('apt-social-feeds'),
+            id: 'twitter-on',
+            name: 'twitterOn',
+            value: true,
+            on: settings['twitterOn'],
+            errors: settings.getErrors('twitterOn'),
+        }) }}
+        {{ forms.textField({
+            label: 'Consumer key'|t('apt-social-feeds'),
+            id: 'twitter-consumer-key',
+            name: 'twitterConsumerKey',
+            value: settings['twitterConsumerKey'],
+            errors: settings.getErrors('twitterConsumerKey'),
+        }) }}
+        {{ forms.textField({
+            label: 'Consumer secret'|t('apt-social-feeds'),
+            id: 'twitter-consumer-secret',
+            name: 'twitterConsumerSecret',
+            value: settings['twitterConsumerSecret'],
+            errors: settings.getErrors('twitterConsumerSecret'),
+        }) }}
+        {{ forms.textField({
+            label: 'Token'|t('apt-social-feeds'),
+            id: 'twitter-token',
+            name: 'twitterToken',
+            value: settings['twitterToken'],
+            errors: settings.getErrors('twitterToken'),
+        }) }}
+        {{ forms.textField({
+            label: 'Token secret'|t('apt-social-feeds'),
+            id: 'twitter-token-secret',
+            name: 'twitterTokenSecret',
+            value: settings['twitterTokenSecret'],
+            errors: settings.getErrors('twitterTokenSecret'),
+        }) }}
+        {{ forms.textField({
+            label: 'Screen name'|t('apt-social-feeds'),
+            instructions: 'Screen name is the username of the twitter account.'|t('apt-social-feeds'),
+            id: 'twitter-screen-name',
+            name: 'twitterScreenName',
+            value: settings['twitterScreenName'],
+            errors: settings.getErrors('twitterScreenName'),
+        }) }}
+        <div class="field">
+            <strong>{{ 'Url to the feed:'|t('apt-social-feeds') }}</strong> <a href="{{ siteUrl }}actions/apt-social-feeds/twitter" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/twitter</a>
+            <br />
+            <br />
+            <h2>{{ 'Feed:'|t('apt-social-feeds') }}</h2>
+            <p>{{ 'Default limit of feed is 6. Add ?limit={your limit} to the query string to load more'|t('apt-social-feeds') }}</p>
+            <p>
+                <a href="{{ siteUrl }}actions/apt-social-feeds/twitter?limit=8" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/twitter?limit=8</a>
+            </p>
+            <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
+            <div class="feed">
+<pre><code>{{ plugin.twitter.feed(3)|json_encode|json_prettify }}</code></pre>
+            </div>
+        </div>
+        {% if
+            settings.hasErrors('twitterOn') or
+            settings.hasErrors('twitterConsumerKey') or
+            settings.hasErrors('twitterConsumerSecret') or
+            settings.hasErrors('twitterToken') or
+            settings.hasErrors('twitterTokenSecret') or
+            settings.hasErrors('twitterScreenName')
+        %}
+            <script>
+                (function() {
+                    var tabs = document.getElementById('tabs');
+                    var tab = tabs.querySelector('a[href="#settings-tab-twitter"]');
+                    if (tab) {
+                        tab.click();
+                    }
+                })();
+            </script>
+        {% endif %}
+    </fieldset>
+{% endif %}
 
+{% if settings.instagram %}
 <fieldset id="tab-instagram" class="hidden">
     <h2>Instagram</h2>
+    <p>
+        {{ 'Use this service to find your Instagram id:'|t('apt-social-feeds') }}<br />
+        <a href="https://codeofaninja.com/tools/find-instagram-user-id" target="_blank" rel="nofollow noreferrer noopener">Find Instagram User ID</a>
+    </p>
+    <p>
+        {{ 'Use this service to generate the Access Token:'|t('apt-social-feeds') }}<br />
+        <a href="http://instagram.pixelunion.net/" target="_blank" rel="nofollow noreferrer noopener">Pixel Union: Get Your Instagram Access Token</a>
+    </p>
     {{ forms.LightswitchField({
-        label: 'On'|t,
-        instructions: 'Enter some setting here.',
+        label: 'Activate feed'|t('apt-social-feeds'),
+        instructions: 'Enter some setting here.'|t('apt-social-feeds'),
         id: 'instagram-on',
         name: 'instagramOn',
         value: true,
@@ -188,21 +299,35 @@
         errors: settings.getErrors('instagramOn'),
     }) }}
     {{ forms.textField({
-        label: 'Id',
-        instructions: 'Enter some setting here.',
+        label: 'Id'|t('apt-social-feeds'),
+        instructions: 'Enter some setting here.'|t('apt-social-feeds'),
         id: 'instagram-id',
         name: 'instagramId',
         value: settings['instagramId'],
         errors: settings.getErrors('instagramId'),
     }) }}
     {{ forms.textField({
-        label: 'Token',
-        instructions: 'Enter some setting here.',
+        label: 'Token'|t('apt-social-feeds'),
+        instructions: 'Enter some setting here.'|t('apt-social-feeds'),
         id: 'instagram-token',
         name: 'instagramToken',
         value: settings['instagramToken'],
         errors: settings.getErrors('instagramToken'),
     }) }}
+    <div class="field">
+        <strong>{{ 'Url to the feed:'|t('apt-social-feeds') }}</strong> <a href="{{ siteUrl }}actions/apt-social-feeds/instagram" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/instagram</a>
+        <br />
+        <br />
+        <h2>{{ 'Feed:'|t('apt-social-feeds') }}</h2>
+        <p>{{ 'Default limit of feed is 6. Add ?limit={your limit} to the query string to load more'|t('apt-social-feeds') }}</p>
+        <p>
+            <a href="{{ siteUrl }}actions/apt-social-feeds/instagram?limit=8" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/instagram?limit=8</a>
+        </p>
+        <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
+        <div class="feed">
+<pre><code>{{ plugin.instagram.feed(3)|json_encode|json_prettify }}</code></pre>
+        </div>
+    </div>
     {% if settings.hasErrors('instagramOn') or settings.hasErrors('instagramId') or settings.hasErrors('instagramToken') %}
         <script>
             (function() {
@@ -215,12 +340,17 @@
         </script>
     {% endif %}
 </fieldset>
+{% endif %}
 
+{% if settings.flickr %}
 <fieldset id="tab-flickr" class="hidden">
     <h2>Flickr</h2>
+    <p>
+        {{ 'Use this service to find your Flickr id:'|t('apt-social-feeds') }}<br />
+        <a href="https://www.webpagefx.com/tools/idgettr/" target="_blank" rel="nofollow noreferrer noopener">idGettr</a>
+    </p>
     {{ forms.LightswitchField({
-        label: 'On'|t,
-        instructions: 'Enter some setting here.',
+        label: 'Activate feed'|t('apt-social-feeds'),
         id: 'flickr-on',
         name: 'flickrOn',
         value: true,
@@ -228,13 +358,26 @@
         errors: settings.getErrors('flickrOn'),
     }) }}
     {{ forms.textField({
-        label: 'Id',
-        instructions: 'Enter some setting here.',
+        label: 'Id'|t('apt-social-feeds'),
         id: 'flickr-id',
         name: 'flickrId',
         value: settings['flickrId'],
         errors: settings.getErrors('flickrId'),
     }) }}
+    <div class="field">
+        <strong>{{ 'Url to the feed:'|t('apt-social-feeds') }}</strong> <a href="{{ siteUrl }}actions/apt-social-feeds/flickr" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/flickr</a>
+        <br />
+        <br />
+        <h2>{{ 'Feed:'|t('apt-social-feeds') }}</h2>
+        <p>{{ 'Default limit of feed is 6. Add ?limit={your limit} to the query string to load more'|t('apt-social-feeds') }}</p>
+        <p>
+            <a href="{{ siteUrl }}actions/apt-social-feeds/flickr?limit=8" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/flickr?limit=8</a>
+        </p>
+        <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
+        <div class="feed">
+<pre><code>{{ plugin.flickr.feed(3)|json_encode|json_prettify }}</code></pre>
+        </div>
+    </div>
     {% if settings.hasErrors('flickrId') or settings.hasErrors('flickrOn') %}
         <script>
             (function() {
@@ -247,3 +390,4 @@
         </script>
     {% endif %}
 </fieldset>
+{% endif %}

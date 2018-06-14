@@ -41,7 +41,7 @@ class Facebook extends Component
 
         $settings = SocialFeeds::$plugin->getSettings();
 
-        $this->activated = $settings->facebookOn;
+        $this->activated = ($settings->facebook && $settings->facebookOn);
         $this->accessToken = $settings->facebookAccessToken;
         $this->pageId = $settings->facebookPageId;
     }
@@ -56,6 +56,13 @@ class Facebook extends Component
      */
     public function getFeed($limit = 6)
     {
+        if (!$this->activated) {
+            return [
+                'status' => 403,
+                'message' => 'Facebook is not activated',
+            ];
+        }
+
         $query = [
             'access_token' => $this->accessToken,
             'fields' => 'story,message,attachments,link,created_time',

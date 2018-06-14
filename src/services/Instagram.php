@@ -39,7 +39,7 @@ class Instagram extends Component
 
         $settings = SocialFeeds::$plugin->getSettings();
 
-        $this->activated = $settings->instagramOn;
+        $this->activated = ($settings->instagram && $settings->instagramOn);
         $this->id = $settings->instagramId;
         $this->token = $settings->instagramToken;
     }
@@ -54,6 +54,13 @@ class Instagram extends Component
      */
     public function getFeed($limit = 6)
     {
+        if (!$this->activated) {
+            return [
+                'status' => 403,
+                'message' => 'Instagram is not activated',
+            ];
+        }
+
         $cacheKey = self::$cacheKey."_{$limit}";
         /* get cached version if exists */
         $items = Craft::$app->cache->get($cacheKey);

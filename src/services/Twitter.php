@@ -43,7 +43,7 @@ class Twitter extends Component
 
         $settings = SocialFeeds::$plugin->getSettings();
 
-        $this->activated = $settings->twitterOn;
+        $this->activated = ($settings->twitter && $settings->twitterOn);
         $this->consumerKey = $settings->twitterConsumerKey;
         $this->consumerSecret = $settings->twitterConsumerSecret;
         $this->token = $settings->twitterToken;
@@ -61,6 +61,13 @@ class Twitter extends Component
      */
     public function getFeed($limit = 6)
     {
+        if (!$this->activated) {
+            return [
+                'status' => 403,
+                'message' => 'Twitter is not activated',
+            ];
+        }
+
         $cacheKey = self::$cacheKey."_{$limit}";
 
         /* get cached version if exists */

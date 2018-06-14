@@ -40,7 +40,7 @@ class Flickr extends Component
 
         $settings = SocialFeeds::$plugin->getSettings();
 
-        $this->activated = $settings->flickrOn;
+        $this->activated = ($settings->flickr && $settings->flickrOn);
         $this->id = $settings->flickrId;
     }
 
@@ -51,6 +51,13 @@ class Flickr extends Component
 
     public function getFeed($limit = 6) : array
     {
+        if (!$this->activated) {
+            return [
+                'status' => 403,
+                'message' => 'Flickr is not activated',
+            ];
+        }
+
         /* get cached version if exists */
         $items = Craft::$app->cache->get(self::$cacheKey);
 

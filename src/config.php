@@ -23,8 +23,9 @@
  */
 
 return [
-
-    // This controls blah blah blah
-    "someAttribute" => true,
-
+    'facebook' => true,
+    'youtube' => true,
+    'twitter' => true,
+    'instagram' => true,
+    'flickr' => true,
 ];

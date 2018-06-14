@@ -20,10 +20,12 @@ use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
 use craft\web\View;
 use craft\events\TemplateEvent;
-
+use craft\events\RegisterCacheOptionsEvent;
+use craft\utilities\ClearCaches;
 use yii\base\Event;
 
 use apt\socialfeeds\services;
+use apt\socialfeeds\twigextensions\TwigTwigExtension;
 
 /**
  * Class SocialFeeds
@@ -59,9 +61,10 @@ class SocialFeeds extends Plugin
      */
     public function init()
     {
-        require_once __DIR__ . '/../vendor/autoload.php';
         parent::init();
         self::$plugin = $this;
+
+        Craft::$app->view->registerTwigExtension(new TwigTwigExtension());
 
         $this->setComponents([
             'flickr' => services\Flickr::class,
@@ -98,25 +101,44 @@ class SocialFeeds extends Plugin
                     $e->template === 'settings/plugins/_settings' &&
                     $e->variables['plugin'] === $this
                 ) {
-                    $e->variables['tabs'] = [
-                        ['label' => 'Facebook', 'url' => '#settings-tab-facebook'],
-                        ['label' => 'Youtube', 'url' => '#settings-tab-youtube'],
-                        ['label' => 'Twitter', 'url' => '#settings-tab-twitter'],
-                        ['label' => 'Instagram', 'url' => '#settings-tab-instagram'],
-                        ['label' => 'Flickr', 'url' => '#settings-tab-flickr'],
-                    ];
+                    $tabs = $this->getTabs();
+                    if (count($tabs) > 0) {
+                        $e->variables['tabs'] = $tabs;
+                    }
                 }
             }
         });
 
         Craft::info(
             Craft::t(
-                'social-feeds',
+                'apt-social-feeds',
                 '{name} plugin loaded',
                 ['name' => $this->name]
             ),
             __METHOD__
         );
+    }
+
+    protected function getTabs() : array
+    {
+        $settings = $this->getSettings();
+        $tabs = [];
+        if ($settings->facebook) {
+            $tabs[] = ['label' => 'Facebook', 'url' => '#settings-tab-facebook'];
+        }
+        if ($settings->youtube) {
+            $tabs[] = ['label' => 'Youtube', 'url' => '#settings-tab-youtube'];
+        }
+        if ($settings->twitter) {
+            $tabs[] = ['label' => 'Twitter', 'url' => '#settings-tab-twitter'];
+        }
+        if ($settings->instagram) {
+            $tabs[] = ['label' => 'Instagram', 'url' => '#settings-tab-instagram'];
+        }
+        if ($settings->flickr) {
+            $tabs[] = ['label' => 'Flickr', 'url' => '#settings-tab-flickr'];
+        }
+        return $tabs;
     }
 
     // Protected Methods
@@ -136,9 +158,10 @@ class SocialFeeds extends Plugin
     protected function settingsHtml(): string
     {
         return Craft::$app->view->renderTemplate(
-            'social-feeds/settings',
+            'apt-social-feeds/settings',
             [
-                'settings' => $this->getSettings()
+                'settings' => $this->getSettings(),
+                'plugin' => $this,
             ]
         );
     }

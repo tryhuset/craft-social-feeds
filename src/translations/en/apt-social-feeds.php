@@ -15,4 +15,5 @@
  */
 return [
     'Social feeds plugin loaded' => 'Social feeds plugin loaded',
+    'Type' => 'Type',
 ];

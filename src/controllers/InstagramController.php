@@ -43,7 +43,12 @@ class InstagramController extends Controller
     {
         $service = SocialFeeds::getInstance()->instagram;
         if (!$service->activated) {
-            return null;
+            $response = Craft::$app->getResponse();
+            $response->headers->set('Status', 403);
+            return $this->asJson([
+                'status' => 403,
+                'message' => 'Instagram is not activated',
+            ]);
         }
 
         $limit = Craft::$app->request->getParam('limit', 6);

@@ -29,6 +29,10 @@ class Youtube extends Component
 
     protected $activated;
 
+    protected $type;
+
+    protected $playlist;
+
     protected $channel;
 
     protected $key;
@@ -41,7 +45,9 @@ class Youtube extends Component
 
         $settings = SocialFeeds::$plugin->getSettings();
 
-        $this->activated = $settings->youtubeOn;
+        $this->activated = ($settings->youtube && $settings->youtubeOn);
+        $this->type = $settings->youtubeType;
+        $this->playlist = $settings->youtubePlaylist;
         $this->channel = $settings->youtubeChannel;
         $this->key = $settings->youtubeKey;
     }
@@ -51,12 +57,45 @@ class Youtube extends Component
         return $this->activated;
     }
 
+    public function getPlaylistId() : string
+    {
+        if ($this->type === 'playlist') {
+            return $this->playlist;
+        }
+
+        $client = new Client([
+            'base_uri' => 'https://www.googleapis.com/youtube/v3/',
+        ]);
+
+        $res = $client->get('channels', ['query' => [
+            'part' => 'contentDetails',
+            'id' => $this->channel,
+            'key' => $this->key,
+        ]]);
+        $data = json_decode($res->getBody(), true);
+
+        $channel = array_shift($data['items']);
+
+        if ($channel) {
+            return $channel['contentDetails']['relatedPlaylists']['uploads'];
+        }
+
+        return '';
+    }
+
     /*
      * @return mixed
      */
     public function getFeed($limit = 6)
     {
-        $cacheKey = self::$cacheKey."_{$limit}";
+        if (!$this->activated) {
+            return [
+                'status' => 403,
+                'message' => 'Youtube is not activated',
+            ];
+        }
+
+        $cacheKey = self::$cacheKey."_{$this->type}_{$limit}";
         /* get cached version if exists */
         $items = Craft::$app->cache->get($cacheKey);
 
@@ -67,17 +106,9 @@ class Youtube extends Component
                     'base_uri' => 'https://www.googleapis.com/youtube/v3/',
                 ]);
 
-                $res = $client->get('channels', ['query' => [
-                    'part' => 'contentDetails',
-                    'id' => $this->channel,
-                    'key' => $this->key,
-                ]]);
-                $data = json_decode($res->getBody(), true);
+                $playlistId = $this->getPlaylistId();
 
-                $channel = array_shift($data['items']);
-                if ($channel) {
-                    $playlistId = $channel['contentDetails']['relatedPlaylists']['uploads'];
-
+                if ($playlistId) {
                     $res = $client->get('playlistItems', ['query' => [
                         'part' => 'snippet',
                         'maxResults' => $limit,
