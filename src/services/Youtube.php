@@ -10,20 +10,17 @@
 
 namespace apt\socialfeeds\services;
 
-use apt\socialfeeds\SocialFeeds;
-
 use Craft;
 use craft\base\Component;
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use apt\socialfeeds\SocialFeeds;
 
 /**
  * @author    Thomas Sømoen
  * @package   SocialFeeds
  * @since     1.0.0
  */
-class Youtube extends Component
+class Youtube extends SocialService
 {
     static protected $cacheKey = 'apt_social_feed_youtube';
 
@@ -43,21 +40,14 @@ class Youtube extends Component
     {
         parent::__construct();
 
-        $settings = SocialFeeds::$plugin->getSettings();
-
-        $this->activated = ($settings->youtube && $settings->youtubeOn);
-        $this->type = $settings->youtubeType;
-        $this->playlist = $settings->youtubePlaylist;
-        $this->channel = $settings->youtubeChannel;
-        $this->key = $settings->youtubeKey;
+        $this->activated = ($this->settings->youtube && $this->settings->youtubeOn);
+        $this->type = $this->settings->youtubeType;
+        $this->playlist = $this->settings->youtubePlaylist;
+        $this->channel = $this->settings->youtubeChannel;
+        $this->key = $this->settings->youtubeKey;
     }
 
-    public function getActivated() : bool
-    {
-        return $this->activated;
-    }
-
-    public function getPlaylistId() : string
+    protected function getPlaylistId() : string
     {
         if ($this->type === 'playlist') {
             return $this->playlist;
@@ -130,9 +120,7 @@ class Youtube extends Component
                     }
                 }
                 Craft::$app->cache->set($cacheKey, $items, 600);
-            } catch (\Exception $e) {
-                echo $e->getMessage();
-            }
+            } catch (\Exception $e) {}
         }
 
         return $items;

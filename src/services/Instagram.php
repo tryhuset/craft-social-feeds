@@ -10,18 +10,17 @@
 
 namespace apt\socialfeeds\services;
 
-use apt\socialfeeds\SocialFeeds;
-
 use Craft;
 use craft\base\Component;
 use GuzzleHttp\Client;
+use apt\socialfeeds\SocialFeeds;
 
 /**
  * @author    Thomas Sømoen
  * @package   SocialFeeds
  * @since     1.0.0
  */
-class Instagram extends Component
+class Instagram extends SocialService
 {
     static protected $cacheKey = 'apt_social_feed_instagram';
 
@@ -37,22 +36,15 @@ class Instagram extends Component
     {
         parent::__construct();
 
-        $settings = SocialFeeds::$plugin->getSettings();
-
-        $this->activated = ($settings->instagram && $settings->instagramOn);
-        $this->id = $settings->instagramId;
-        $this->token = $settings->instagramToken;
-    }
-
-    public function getActivated() : bool
-    {
-        return $this->activated;
+        $this->activated = ($this->settings->instagram && $this->settings->instagramOn);
+        $this->id = $this->settings->instagramId;
+        $this->token = $this->settings->instagramToken;
     }
 
     /*
      * @return mixed
      */
-    public function getFeed($limit = 6)
+    public function getFeed($limit = 6) : array
     {
         if (!$this->activated) {
             return [

@@ -10,20 +10,17 @@
 
 namespace apt\socialfeeds\services;
 
-use apt\socialfeeds\SocialFeeds;
-
 use Craft;
 use craft\base\Component;
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use apt\socialfeeds\SocialFeeds;
 
 /**
  * @author    Thomas Sømoen
  * @package   SocialFeeds
  * @since     1.0.0
  */
-class Flickr extends Component
+class Flickr extends SocialService
 {
     static protected $cacheKey = 'apt_social_feed_flickr';
 
@@ -38,15 +35,8 @@ class Flickr extends Component
     {
         parent::__construct();
 
-        $settings = SocialFeeds::$plugin->getSettings();
-
-        $this->activated = ($settings->flickr && $settings->flickrOn);
-        $this->id = $settings->flickrId;
-    }
-
-    public function getActivated() : bool
-    {
-        return $this->activated;
+        $this->activated = ($this->settings->flickr && $this->settings->flickrOn);
+        $this->id = $this->settings->flickrId;
     }
 
     public function getFeed($limit = 6) : array
@@ -87,24 +77,9 @@ class Flickr extends Component
                     }
                 }
                 Craft::$app->cache->set(self::$cacheKey, $items, 600);
-            } catch (\Exception $e) {
-
-            }
+            } catch (\Exception $e) {}
         }
 
         return array_splice($items, 0, $limit);
-    }
-
-    /*
-     * @return mixed
-     */
-    public function exampleService()
-    {
-        $result = 'something';
-        // Check our Plugin's settings for `someAttribute`
-        if (SocialFeeds::$plugin->getSettings()->someAttribute) {
-        }
-
-        return $result;
     }
 }

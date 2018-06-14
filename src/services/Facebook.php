@@ -10,19 +10,16 @@
 
 namespace apt\socialfeeds\services;
 
-use apt\socialfeeds\SocialFeeds;
 use Craft;
-use craft\base\Component;
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use apt\socialfeeds\SocialFeeds;
 
 /**
  * @author    Thomas Sømoen
  * @package   SocialFeeds
  * @since     1.0.0
  */
-class Facebook extends Component
+class Facebook extends SocialService
 {
 
     static protected $cacheKey = 'apt_social_feed_facebook';
@@ -39,16 +36,9 @@ class Facebook extends Component
     {
         parent::__construct();
 
-        $settings = SocialFeeds::$plugin->getSettings();
-
-        $this->activated = ($settings->facebook && $settings->facebookOn);
-        $this->accessToken = $settings->facebookAccessToken;
-        $this->pageId = $settings->facebookPageId;
-    }
-
-    public function getActivated() : bool
-    {
-        return $this->activated;
+        $this->activated = ($this->settings->facebook && $this->settings->facebookOn);
+        $this->accessToken = $this->settings->facebookAccessToken;
+        $this->pageId = $this->settings->facebookPageId;
     }
 
     /*

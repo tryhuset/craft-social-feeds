@@ -10,13 +10,12 @@
 
 namespace apt\socialfeeds\services;
 
-use apt\socialfeeds\SocialFeeds;
-
 use Craft;
 use craft\base\Component;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use apt\socialfeeds\SocialFeeds;
 
 
 /**
@@ -24,7 +23,7 @@ use GuzzleHttp\Subscriber\Oauth\Oauth1;
  * @package   SocialFeeds
  * @since     1.0.0
  */
-class Twitter extends Component
+class Twitter extends SocialService
 {
     static protected $cacheKey = 'apt_social_feed_twitter';
 
@@ -41,25 +40,18 @@ class Twitter extends Component
     {
         parent::__construct();
 
-        $settings = SocialFeeds::$plugin->getSettings();
-
-        $this->activated = ($settings->twitter && $settings->twitterOn);
-        $this->consumerKey = $settings->twitterConsumerKey;
-        $this->consumerSecret = $settings->twitterConsumerSecret;
-        $this->token = $settings->twitterToken;
-        $this->tokenSecret = $settings->twitterTokenSecret;
-        $this->screenName = $settings->twitterScreenName;
-    }
-
-    public function getActivated() : bool
-    {
-        return $this->activated;
+        $this->activated = ($this->settings->twitter && $this->settings->twitterOn);
+        $this->consumerKey = $this->settings->twitterConsumerKey;
+        $this->consumerSecret = $this->settings->twitterConsumerSecret;
+        $this->token = $this->settings->twitterToken;
+        $this->tokenSecret = $this->settings->twitterTokenSecret;
+        $this->screenName = $this->settings->twitterScreenName;
     }
 
     /*
      * @return mixed
      */
-    public function getFeed($limit = 6)
+    public function getFeed($limit = 6) : array
     {
         if (!$this->activated) {
             return [

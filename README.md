@@ -66,6 +66,36 @@ Set the service you want to disable to false.
 
 ## Using Social feeds
 
+The plugin has a service variable which can be access through:
+
+```
+craft.aptSocialFeeds
+```
+
+The service has two methods:
+
+```
+craft.aptSocialFeeds.activated('servicekey')
+```
+```
+craft.aptSocialFeeds.feed('servicekey', limit)
+```
+
+Service key can be:
+* 'facebook'
+* 'youtube'
+* 'instagram'
+* 'twitter'
+* 'flickr'
+
+Limit is an integer and limits the number of items in the feed.<br />
+*If omitted it will return 6.*
+
+function activated returns true if service is activated.<br />
+function feed return the feed as an array
+
+### Access the feed in the browser:
+
 When activated the feeds can be accessed by the following url:
 
 * /actions/apt-social-feeds/facebook
@@ -76,5 +106,38 @@ When activated the feeds can be accessed by the following url:
 
 The feeds has a default limit of 6.
 If you need more add ?limit=[your limit] to the query string
+
+### Access service
+
+#### In Twig template
+
+```
+{{ craft.aptSocialFeeds }}
+{{ craft.aptSocialFeeds.activated('servicekey') }}
+{{ craft.aptSocialFeeds.feed('servicekey', limit) }}
+```
+
+#### In php
+```
+use apt\socialfeeds\SocialFeeds;
+
+$service = SocialFeeds::getInstance();
+
+$service->facebook->isActivated();
+$service->facebook->getFeed($limit);
+
+$service->youtube->isActivated();
+$service->youtube->getFeed($limit);
+
+$service->instagram->isActivated();
+$service->instagram->getFeed($limit);
+
+$service->twitter->isActivated();
+$service->twitter->getFeed($limit);
+
+$service->flickr->isActivated();
+$service->flickr->getFeed($limit);
+```
+
 
 Brought to you by [Thomas Sømoen](https://apt.no/)

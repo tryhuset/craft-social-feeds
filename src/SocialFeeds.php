@@ -10,8 +10,6 @@
 
 namespace apt\socialfeeds;
 
-use apt\socialfeeds\models\Settings;
-
 use Craft;
 use craft\base\Plugin;
 use craft\services\Plugins;
@@ -22,8 +20,11 @@ use craft\web\View;
 use craft\events\TemplateEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\utilities\ClearCaches;
+use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
 
+use apt\socialfeeds\models\Settings;
+use apt\socialfeeds\models\Variable;
 use apt\socialfeeds\services;
 use apt\socialfeeds\twigextensions\TwigTwigExtension;
 
@@ -73,6 +74,11 @@ class SocialFeeds extends Plugin
             'twitter' => services\Twitter::class,
             'youtube' => services\Youtube::class,
         ]);
+
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
+            $variable = $event->sender;
+            $variable->set('aptSocialFeeds', Variable::class);
+        });
 
         Event::on(
             UrlManager::class,
