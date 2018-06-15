@@ -47,60 +47,7 @@ class TwigTwigExtension extends \Twig_Extension
 
     public function getFunctions()
     {
-        return [
-        ];
-    }
-
-    public function toFloat($value)
-    {
-        $val = filter_var($value, FILTER_VALIDATE_FLOAT);
-        if($val){
-            return $val;
-        }
-        return $value;
-    }
-
-    public function decimalCount($string)
-    {
-      if (empty($string)) {
-        return 0;
-      }
-      $count = strlen(substr(strrchr($string, "."), 1));
-      return intval($count);
-    }
-
-    public function nl2p($str)
-    {
-        $arr=explode("\n",$str);
-        $out='';
-
-        for($i=0;$i<count($arr);$i++) {
-            if(strlen(trim($arr[$i]))>0)
-                $out.='<p>'.trim($arr[$i]).'</p>';
-        }
-        return $out;
-    }
-
-    public function abbreviateWords($string, $charcount)
-    {
-        if (strlen($string) <= $charcount) {
-            return trim($string);
-        }
-        $strings = explode(' ', $string);
-        $result = '';
-        if (empty($strings) == false) {
-            foreach ($strings as $word) {
-                if (strlen("$result $word") > $charcount) {
-                    break;
-                }
-                $result .= " $word";
-            }
-            if (strlen($string) > strlen($result)) {
-                $result .= " …";
-            }
-            return trim($result);
-        }
-        return trim($string);
+        return [];
     }
 
     public function jsonPrettify($json)
