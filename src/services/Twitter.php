@@ -65,7 +65,7 @@ class Twitter extends SocialService
         /* get cached version if exists */
         $items = Craft::$app->cache->get($cacheKey);
 
-        if (empty($tweets)) {
+        if (empty($items)) {
             $items = [];
             try {
                 $stack = HandlerStack::create();
