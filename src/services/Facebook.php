@@ -12,6 +12,8 @@ namespace apt\socialfeeds\services;
 
 use Craft;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use yii\caching\ExpressionDependency;
 use apt\socialfeeds\SocialFeeds;
 
 /**
@@ -26,9 +28,13 @@ class Facebook extends SocialService
 
     protected $activated;
 
-    protected $accessToken;
+    protected $appId;
+
+    protected $appSecret;
 
     protected $pageId;
+
+    protected $client;
 
     // Public Methods
     // =========================================================================
@@ -37,8 +43,12 @@ class Facebook extends SocialService
         parent::__construct();
 
         $this->activated = ($this->settings->facebook && $this->settings->facebookOn);
-        $this->accessToken = $this->settings->facebookAccessToken;
+        $this->appId = $this->settings->facebookAppId;
+        $this->appSecret = $this->settings->facebookAppSecret;
         $this->pageId = $this->settings->facebookPageId;
+        $this->client = new Client([
+            'base_uri' => 'https://graph.facebook.com/',
+        ]);
     }
 
     /*
@@ -49,19 +59,23 @@ class Facebook extends SocialService
         if (!$this->activated) {
             return [
                 'status' => 403,
-                'message' => 'Facebook is not activated',
+                'message' => Craft::t('apt-social-feeds', 'Facebook is not activated'),
             ];
         }
 
         $query = [
-            'access_token' => $this->accessToken,
+            'access_token' => "{$this->appId}|{$this->appSecret}",
             'fields' => 'story,message,attachments,link,created_time',
         ];
 
         if ($limit) {
             $query['limit'] = $limit;
         }
-        $cacheKey = self::$cacheKey."_{$limit}";
+
+        $cacheKey = [
+            self::$cacheKey,
+            $limit,
+        ];
 
         /* get cached version if exists */
         $items = Craft::$app->cache->get($cacheKey);
@@ -69,12 +83,9 @@ class Facebook extends SocialService
         if (empty($items)) {
             $items = [];
             try {
-                $client = new Client([
-                    'base_uri' => 'https://graph.facebook.com/',
-                ]);
-
-                $res = $client->get("{$this->pageId}/posts", ['query' => $query]);
+                $res = $this->client->get("{$this->pageId}/posts", ['query' => $query]);
                 $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
+
                 foreach ($data['data'] as $item) {
                     $time = new \DateTime($item['created_time']);
                     if (isset($item['attachments'])) {
@@ -90,11 +101,42 @@ class Facebook extends SocialService
 
                     $items[] = $item;
                 }
-                Craft::$app->cache->set($cacheKey, $items, 600);
-            } catch (\Exception $e) {}
+                $dependency = new ExpressionDependency([
+                    'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getFacebookStateString() == $this->params["state"]',
+                    'params' => [
+                        'state' => $this->settings->getFacebookStateString(),
+                    ],
+                ]);
+                Craft::$app->cache->set($cacheKey, $items, 600, $dependency);
+            } catch (ClientException $e) {
+                $res = $e->getResponse();
+                $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
+                if (array_key_exists('error', $data)) {
+                    return array_merge([
+                        'error' => true,
+                        'status' => $res->getStatusCode(),
+                    ], $data['error']);
+                }
+                return [
+                    'error' => true,
+                    'status' => $e->getCode(),
+                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+                ];
+            } catch (\Exception $e) {
+                return [
+                    'error' => true,
+                    'status' => 500,
+                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+                ];
+            }
         }
 
         return $items;
+    }
+
+    public function emptyCache()
+    {
+        // TagDependency::invalidate(Craft::$app->cache, self::$cacheKey);
     }
 
     protected function manageEmoji($text)

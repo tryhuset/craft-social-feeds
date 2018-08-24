@@ -54,6 +54,11 @@ class FacebookController extends Controller
         $limit = Craft::$app->request->getParam('limit', 6);
         $feed = $service->getFeed($limit);
 
+        if (array_key_exists('status', $feed)) {
+            $response = Craft::$app->getResponse();
+            $response->headers->set('Status', $feed['status']);
+        }
+
         return $this->asJson($feed);
     }
 }

@@ -13,6 +13,8 @@ namespace apt\socialfeeds\services;
 use Craft;
 use craft\base\Component;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use yii\caching\ExpressionDependency;
 use apt\socialfeeds\SocialFeeds;
 
 /**
@@ -52,7 +54,6 @@ class Flickr extends SocialService
         $items = Craft::$app->cache->get(self::$cacheKey);
 
         if (empty($items)) {
-
             $items = [];
             try {
                 $client = new Client([
@@ -76,8 +77,34 @@ class Flickr extends SocialService
                         ];
                     }
                 }
-                Craft::$app->cache->set(self::$cacheKey, $items, 600);
-            } catch (\Exception $e) {}
+                $dependency = new ExpressionDependency([
+                    'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getFlickrStateString() == $this->params["state"]',
+                    'params' => [
+                        'state' => $this->settings->getFlickrStateString(),
+                    ],
+                ]);
+                Craft::$app->cache->set(self::$cacheKey, $items, 600, $dependency);
+            } catch (ClientException $e) {
+                $res = $e->getResponse();
+                if ($res->getStatusCode() === 404) {
+                    return [
+                        'error' => true,
+                        'status' => 404,
+                        'message' => Craft::t('apt-social-feeds', 'Ficker id {id} not found', ['id' => $this->id]),
+                    ];
+                }
+                return [
+                    'error' => true,
+                    'status' => $e->getCode(),
+                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+                ];
+            } catch (\Exception $e) {
+                return [
+                    'error' => true,
+                    'status' => 500,
+                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+                ];
+            }
         }
 
         return array_splice($items, 0, $limit);

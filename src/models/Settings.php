@@ -56,11 +56,16 @@ class Settings extends Model
     public $youtubeKey = '';
 
     public $facebookOn = false;
-    public $facebookAccessToken = '';
+    public $facebookAppId = '';
+    public $facebookAppSecret = '';
     public $facebookPageId = '';
 
-    // Public Methods
-    // =========================================================================
+
+    public function __construct($config = null)
+    {
+        unset($config['facebookAccessToken']);
+        parent::__construct($config);
+    }
 
     protected function getTwitterRules()
     {
@@ -176,15 +181,18 @@ class Settings extends Model
         $rules = [
             ['facebookOn', 'boolean'],
             ['facebookOn', 'default', 'value' => false],
-            ['facebookAccessToken', 'string'],
-            ['facebookAccessToken', 'default', 'value' => ''],
+            ['facebookAppId', 'string'],
+            ['facebookAppId', 'default', 'value' => ''],
+            ['facebookAppSecret', 'string'],
+            ['facebookAppSecret', 'default', 'value' => ''],
             ['facebookPageId', 'string'],
             ['facebookPageId', 'default', 'value' => ''],
         ];
 
         if ($this->facebookOn) {
             $rules = array_merge($rules, [
-                ['facebookAccessToken', 'required'],
+                ['facebookAppId', 'required'],
+                ['facebookAppSecret', 'required'],
                 ['facebookPageId', 'required'],
             ]);
         }
@@ -208,5 +216,30 @@ class Settings extends Model
         $facebook = $this->getFacebookRules();
 
         return array_merge($global, $twitter, $flickr, $instagram, $youtube, $facebook);
+    }
+
+    public function getTwitterStateString()
+    {
+        return "{$this->twitterConsumerKey}_{$this->twitterConsumerSecret}_{$this->twitterToken}_{$this->twitterTokenSecret}_{$this->twitterScreenName}";
+    }
+
+    public function getYoutubeStateString()
+    {
+        return "{$this->youtubeType}_{$this->youtubePlaylist}_{$this->youtubeChannel}_{$this->youtubeKey}";
+    }
+
+    public function getInstagramStateString()
+    {
+        return "{$this->instagramId}_{$this->instagramToken}";
+    }
+
+    public function getFlickrStateString()
+    {
+        return "{$this->flickrId}";
+    }
+
+    public function getFacebookStateString()
+    {
+        return "{$this->facebookAppId}_{$this->facebookAppSecret}_{$this->facebookPageId}";
     }
 }

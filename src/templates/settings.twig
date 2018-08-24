@@ -21,10 +21,6 @@
     <fieldset id="tab-facebook">
         <h2>Facebook</h2>
         <p>
-            {{ 'To obtain Facebook Access Token, follow this recipe:'|t('apt-social-feeds') }}<br />
-            <a href="https://smashballoon.com/custom-facebook-feed/access-token/" target="_blank" rel="nofollow noreferrer noopener">Smashballoon: How to get a Facebook Access Token</a>
-        </p>
-        <p>
             {{ 'To find your page id, follow this recipe:'|t('apt-social-feeds') }}<br />
             <a href="https://findmyfbid.com/" target="_blank" rel="nofollow noreferrer noopener">Find your Facebook ID</a>
         </p>
@@ -37,11 +33,18 @@
             errors: settings.getErrors('facebookOn'),
         }) }}
         {{ forms.textField({
-            label: 'Access token'|t('apt-social-feeds'),
-            id: 'facebook-access-token',
-            name: 'facebookAccessToken',
-            value: settings['facebookAccessToken'],
-            errors: settings.getErrors('facebookAccessToken'),
+            label: 'App Id'|t('apt-social-feeds'),
+            id: 'facebook-app-id',
+            name: 'facebookAppId',
+            value: settings['facebookAppId'],
+            errors: settings.getErrors('facebookAppId'),
+        }) }}
+        {{ forms.textField({
+            label: 'App secret'|t('apt-social-feeds'),
+            id: 'facebook-app-secret',
+            name: 'facebookAppSecret',
+            value: settings['facebookAppSecret'],
+            errors: settings.getErrors('facebookAppSecret'),
         }) }}
         {{ forms.textField({
             label: 'Page id'|t('apt-social-feeds'),

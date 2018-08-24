@@ -13,6 +13,8 @@ namespace apt\socialfeeds\services;
 use Craft;
 use craft\base\Component;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use yii\caching\ExpressionDependency;
 use apt\socialfeeds\SocialFeeds;
 
 /**
@@ -53,7 +55,8 @@ class Instagram extends SocialService
             ];
         }
 
-        $cacheKey = self::$cacheKey."_{$limit}";
+        $cacheKey = [self::$cacheKey, $limit];
+
         /* get cached version if exists */
         $items = Craft::$app->cache->get($cacheKey);
 
@@ -78,8 +81,37 @@ class Instagram extends SocialService
                         'image' => $item['images']['low_resolution']['url'],
                     ];
                 }
+                $dependency = new ExpressionDependency([
+                    'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getInstagramStateString() == $this->params["state"]',
+                    'params' => [
+                        'state' => $this->settings->getInstagramStateString(),
+                    ],
+                ]);
                 Craft::$app->cache->set($cacheKey, $items, 600);
-            } catch (\Exception $e) {}
+            } catch (ClientException $e) {
+                $res = $e->getResponse();
+                $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
+                if (array_key_exists('meta', $data)) {
+                    return [
+                        'error' => true,
+                        'status' => $res->getStatusCode(),
+                        'code' => $data['meta']['code'],
+                        'type' => $data['meta']['error_type'],
+                        'message' => $data['meta']['error_message'],
+                    ];
+                }
+                return [
+                    'error' => true,
+                    'status' => $e->getCode(),
+                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+                ];
+            } catch (\Exception $e) {
+                return [
+                    'error' => true,
+                    'status' => 500,
+                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+                ];
+            }
         }
 
 

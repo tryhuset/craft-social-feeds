@@ -15,6 +15,8 @@ use craft\base\Component;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use GuzzleHttp\Exception\ClientException;
+use yii\caching\ExpressionDependency;
 use apt\socialfeeds\SocialFeeds;
 
 
@@ -60,7 +62,7 @@ class Twitter extends SocialService
             ];
         }
 
-        $cacheKey = self::$cacheKey."_{$limit}";
+        $cacheKey = [self::$cacheKey, $limit];
 
         /* get cached version if exists */
         $items = Craft::$app->cache->get($cacheKey);
@@ -98,8 +100,42 @@ class Twitter extends SocialService
                         'user' => $tweet['user']['screen_name'],
                     ];
                 }
-                Craft::$app->cache->set($cacheKey, $items, 600);
-            } catch (\Exception $e) {}
+
+                $dependency = new ExpressionDependency([
+                    'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getTwitterStateString() == $this->params["state"]',
+                    'params' => [
+                        'state' => $this->settings->getTwitterStateString(),
+                    ],
+                ]);
+                Craft::$app->cache->set($cacheKey, $items, 600, $dependency);
+            } catch (ClientException $e) {
+                $res = $e->getResponse();
+                $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
+                if (array_key_exists('errors', $data)) {
+                    if (is_array($data['errors'])) {
+                        $error = array_shift($data['errors']);
+                        return array_merge([
+                            'error' => true,
+                            'status' => $res->getStatusCode(),
+                        ], $error);
+                    }
+                    return array_merge([
+                        'error' => true,
+                        'status' => $res->getStatusCode(),
+                    ], $data['errors']);
+                }
+                return [
+                    'error' => true,
+                    'status' => $e->getCode(),
+                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+                ];
+            } catch (\Exception $e) {
+                return [
+                    'error' => true,
+                    'status' => 500,
+                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+                ];
+            }
         }
 
         return $items;
