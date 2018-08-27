@@ -26,7 +26,7 @@ use yii\base\Event;
 use apt\socialfeeds\models\Settings;
 use apt\socialfeeds\models\Variable;
 use apt\socialfeeds\services;
-use apt\socialfeeds\twigextensions\TwigTwigExtension;
+use apt\socialfeeds\twigextensions\TwigExtension;
 
 /**
  * Class SocialFeeds
@@ -65,14 +65,50 @@ class SocialFeeds extends Plugin
         parent::init();
         self::$plugin = $this;
 
-        Craft::$app->view->registerTwigExtension(new TwigTwigExtension());
+        Craft::$app->view->registerTwigExtension(new TwigExtension());
 
         $this->setComponents([
-            'flickr' => services\Flickr::class,
-            'facebook' => services\Facebook::class,
-            'instagram' => services\Instagram::class,
-            'twitter' => services\Twitter::class,
-            'youtube' => services\Youtube::class,
+            'facebook' => new services\Facebook([
+                'activated' => ($this->settings->facebook && $this->settings->facebookOn),
+                'appId' => $this->settings->facebookAppId,
+                'appSecret'=> $this->settings->facebookAppSecret,
+                'pageId' => $this->settings->facebookPageId,
+                'cache' => Craft::$app->cache,
+                'state' => $this->settings->getFacebookStateString(),
+            ]),
+            'instagram' => new services\Instagram([
+                'activated' => ($this->settings->instagram && $this->settings->instagramOn),
+                'id' => $this->settings->instagramId,
+                'token' => $this->settings->instagramToken,
+                'cache' => Craft::$app->cache,
+                'state' => $this->settings->getInstagramStateString(),
+            ]),
+            'twitter' => new services\Twitter([
+                'settings' => $this->settings,
+                'activated' => ($this->settings->twitter && $this->settings->twitterOn),
+                'consumerKey' => $this->settings->twitterConsumerKey,
+                'consumerSecret' => $this->settings->twitterConsumerSecret,
+                'token' => $this->settings->twitterToken,
+                'tokenSecret' => $this->settings->twitterTokenSecret,
+                'screenName' => $this->settings->twitterScreenName,
+                'cache' => Craft::$app->cache,
+                'state' => $this->settings->getTwitterStateString(),
+            ]),
+            'youtube' => new services\Youtube([
+                'activated' => ($this->settings->youtube && $this->settings->youtubeOn),
+                'type' => $this->settings->youtubeType,
+                'playlist' => $this->settings->youtubePlaylist,
+                'channel' => $this->settings->youtubeChannel,
+                'key' => $this->settings->youtubeKey,
+                'cache' => Craft::$app->cache,
+                'state' => $this->settings->getYoutubeStateString(),
+            ]),
+            'flickr' => new services\Flickr([
+                'activated' => ($this->settings->flickr && $this->settings->flickrOn),
+                'id' => $this->settings->flickrId,
+                'cache' => Craft::$app->cache,
+                'state' => $this->settings->getYoutubeStateString(),
+            ]),
         ]);
 
         Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {

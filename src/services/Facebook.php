@@ -11,7 +11,6 @@
 namespace apt\socialfeeds\services;
 
 use Craft;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use yii\caching\ExpressionDependency;
 use apt\socialfeeds\SocialFeeds;
@@ -26,30 +25,11 @@ class Facebook extends SocialService
 
     static protected $cacheKey = 'apt_social_feed_facebook';
 
-    protected $activated;
-
     protected $appId;
 
     protected $appSecret;
 
     protected $pageId;
-
-    protected $client;
-
-    // Public Methods
-    // =========================================================================
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->activated = ($this->settings->facebook && $this->settings->facebookOn);
-        $this->appId = $this->settings->facebookAppId;
-        $this->appSecret = $this->settings->facebookAppSecret;
-        $this->pageId = $this->settings->facebookPageId;
-        $this->client = new Client([
-            'base_uri' => 'https://graph.facebook.com/',
-        ]);
-    }
 
     /*
      * @return mixed
@@ -78,11 +58,14 @@ class Facebook extends SocialService
         ];
 
         /* get cached version if exists */
-        $items = Craft::$app->cache->get($cacheKey);
+        $items = $this->cache->get($cacheKey);
 
         if (empty($items)) {
             $items = [];
-            $res = $this->client->get("{$this->pageId}/posts", ['query' => $query]);
+            $client = $this->getClient([
+                'base_uri' => 'https://graph.facebook.com/',
+            ]);
+            $res = $client->get("{$this->pageId}/posts", ['query' => $query]);
             $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
 
             foreach ($data['data'] as $item) {
@@ -100,13 +83,14 @@ class Facebook extends SocialService
 
                 $items[] = $item;
             }
+
             $dependency = new ExpressionDependency([
                 'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getFacebookStateString() == $this->params["state"]',
                 'params' => [
-                    'state' => $this->settings->getFacebookStateString(),
+                    'state' => $this->state,
                 ],
             ]);
-            Craft::$app->cache->set($cacheKey, $items, 600, $dependency);
+            $this->cache->set($cacheKey, $items, 600, $dependency);
 
             return $items;
         }

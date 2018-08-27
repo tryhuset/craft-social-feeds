@@ -36,26 +36,13 @@ class Youtube extends SocialService
 
     protected $key;
 
-    // Public Methods
-    // =========================================================================
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->activated = ($this->settings->youtube && $this->settings->youtubeOn);
-        $this->type = $this->settings->youtubeType;
-        $this->playlist = $this->settings->youtubePlaylist;
-        $this->channel = $this->settings->youtubeChannel;
-        $this->key = $this->settings->youtubeKey;
-    }
-
     protected function getPlaylistId() : string
     {
         if ($this->type === 'playlist') {
             return $this->playlist;
         }
 
-        $client = new Client([
+        $client = $this->getClient([
             'base_uri' => 'https://www.googleapis.com/youtube/v3/',
         ]);
 
@@ -94,11 +81,11 @@ class Youtube extends SocialService
             $limit,
         ];
         /* get cached version if exists */
-        $items = Craft::$app->cache->get($cacheKey);
+        $items = $this->cache->get($cacheKey);
 
         if (empty($items)) {
             $items = [];
-            $client = new Client([
+            $client = $this->getClient([
                 'base_uri' => 'https://www.googleapis.com/youtube/v3/',
             ]);
 
@@ -130,10 +117,10 @@ class Youtube extends SocialService
             $dependency = new ExpressionDependency([
                 'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getYoutubeStateString() == $this->params["state"]',
                 'params' => [
-                    'state' => $this->settings->getYoutubeStateString(),
+                    'state' => $this->state,
                 ],
             ]);
-            Craft::$app->cache->set($cacheKey, $items, 600, $dependency);
+            $this->cache->set($cacheKey, $items, 600, $dependency);
         }
 
         return $items;

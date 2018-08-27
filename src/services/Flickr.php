@@ -12,7 +12,6 @@ namespace apt\socialfeeds\services;
 
 use Craft;
 use craft\base\Component;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use yii\caching\ExpressionDependency;
 use apt\socialfeeds\SocialFeeds;
@@ -30,17 +29,6 @@ class Flickr extends SocialService
 
     protected $id;
 
-    // Public Methods
-    // =========================================================================
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->activated = ($this->settings->flickr && $this->settings->flickrOn);
-        $this->id = $this->settings->flickrId;
-    }
-
     public function executeLookup($limit = 6) : array
     {
         if (!$this->activated) {
@@ -51,11 +39,12 @@ class Flickr extends SocialService
         }
 
         /* get cached version if exists */
-        $items = Craft::$app->cache->get(self::$cacheKey);
+        $items = $this->cache->get(self::$cacheKey);
 
         if (empty($items)) {
             $items = [];
-            $client = new Client([
+
+            $client = $this->getClient([
                 'base_uri' => 'https://api.flickr.com/services/feeds/',
             ]);
 
@@ -80,10 +69,10 @@ class Flickr extends SocialService
             $dependency = new ExpressionDependency([
                 'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getFlickrStateString() == $this->params["state"]',
                 'params' => [
-                    'state' => $this->settings->getFlickrStateString(),
+                    'state' => $this->state,
                 ],
             ]);
-            Craft::$app->cache->set(self::$cacheKey, $items, 600, $dependency);
+            $this->cache->set(self::$cacheKey, $items, 600, $dependency);
         }
 
         return array_splice($items, 0, $limit);

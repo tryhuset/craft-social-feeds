@@ -21,12 +21,9 @@ use LitEmoji\LitEmoji;
 
 interface iSocialService
 {
-    // public function encodeEmojis($string);
     public function getActivated();
     public function isActivated();
     public function getFeedWithErrors($limit);
-    // public function getFeedWithoutErrors($limit);
-    // public function getFeed($limit);
     public function executeLookup($limit);
 }
 
@@ -39,20 +36,33 @@ abstract class SocialService extends Component implements iSocialService
 {
     static protected $cacheKey = 'apt_social_feed';
 
-    protected $settings;
-
     protected $activated = false;
 
-    public function encodeEmojis($string) : string
-    {
-        return LitEmoji::encodeShortcode($string);
-    }
+    protected $cache;
 
-    public function __construct()
+    protected $clientClass;
+
+    protected $state = '';
+
+    public function __construct($config = [])
     {
         parent::__construct();
 
-        $this->settings = SocialFeeds::$plugin->getSettings();
+        $config = array_merge([
+            'clientClass' => Client::class,
+            'cache' => Craft::$app->cache,
+        ], $config);
+
+        foreach ($config as $key => $value) {
+            if (property_exists($this , $key)) {
+                $this->$key = $value;
+            }
+        }
+    }
+
+    protected function getClient($config = [])
+    {
+        return new $this->clientClass($config);
     }
 
     public function getActivated() : bool
@@ -63,6 +73,11 @@ abstract class SocialService extends Component implements iSocialService
     public function isActivated() : bool
     {
         return $this->getActivated();
+    }
+
+    public function encodeEmojis($string) : string
+    {
+        return LitEmoji::encodeShortcode($string);
     }
 
     public function getFeedWithoutErrors($limit)

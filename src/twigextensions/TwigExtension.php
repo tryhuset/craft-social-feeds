@@ -26,7 +26,7 @@ use Craft;
  * @package   Twig
  * @since     1.0.0
  */
-class TwigTwigExtension extends \Twig_Extension
+class TwigExtension extends \Twig_Extension
 {
     public function __construct()
     {

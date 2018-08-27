@@ -32,17 +32,6 @@ class Instagram extends SocialService
 
     protected $token;
 
-    // Public Methods
-    // =========================================================================
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->activated = ($this->settings->instagram && $this->settings->instagramOn);
-        $this->id = $this->settings->instagramId;
-        $this->token = $this->settings->instagramToken;
-    }
-
     /*
      * @return mixed
      */
@@ -58,14 +47,13 @@ class Instagram extends SocialService
         $cacheKey = [self::$cacheKey, $limit];
 
         /* get cached version if exists */
-        $items = Craft::$app->cache->get($cacheKey);
+        $items = $this->cache->get($cacheKey);
 
         if (empty($items)) {
             $items = [];
-            $client = new Client([
+            $client = $this->getClient([
                 'base_uri' => 'https://api.instagram.com/v1/',
             ]);
-
             $res = $client->get("users/{$this->id}/media/recent", ['query' => [
                 'access_token' => $this->token,
                 'count' => $limit,
@@ -83,10 +71,10 @@ class Instagram extends SocialService
             $dependency = new ExpressionDependency([
                 'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getInstagramStateString() == $this->params["state"]',
                 'params' => [
-                    'state' => $this->settings->getInstagramStateString(),
+                    'state' => $this->state,
                 ],
             ]);
-            Craft::$app->cache->set($cacheKey, $items, 600);
+            $this->cache->set($cacheKey, $items, 600);
         }
 
 

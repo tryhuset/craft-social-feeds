@@ -36,20 +36,6 @@ class Twitter extends SocialService
     protected $tokenSecret;
     protected $screenName;
 
-    // Public Methods
-    // =========================================================================
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->activated = ($this->settings->twitter && $this->settings->twitterOn);
-        $this->consumerKey = $this->settings->twitterConsumerKey;
-        $this->consumerSecret = $this->settings->twitterConsumerSecret;
-        $this->token = $this->settings->twitterToken;
-        $this->tokenSecret = $this->settings->twitterTokenSecret;
-        $this->screenName = $this->settings->twitterScreenName;
-    }
-
     /*
      * @return mixed
      */
@@ -65,7 +51,7 @@ class Twitter extends SocialService
         $cacheKey = [self::$cacheKey, $limit];
 
         /* get cached version if exists */
-        $items = Craft::$app->cache->get($cacheKey);
+        $items = $this->cache->get($cacheKey);
 
         if (empty($items)) {
             $items = [];
@@ -79,7 +65,7 @@ class Twitter extends SocialService
 
             $stack->push($middleware);
 
-            $client = new Client([
+            $client = $this->getClient([
                 'base_uri' => 'https://api.twitter.com/1.1/',
                 'handler' => $stack,
                 'auth' => 'oauth',
@@ -103,10 +89,10 @@ class Twitter extends SocialService
             $dependency = new ExpressionDependency([
                 'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getTwitterStateString() == $this->params["state"]',
                 'params' => [
-                    'state' => $this->settings->getTwitterStateString(),
+                    'state' => $this->state,
                 ],
             ]);
-            Craft::$app->cache->set($cacheKey, $items, 600, $dependency);
+            $this->cache->set($cacheKey, $items, 600, $dependency);
         }
 
         return $items;
