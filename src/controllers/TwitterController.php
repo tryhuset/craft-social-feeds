@@ -42,17 +42,8 @@ class TwitterController extends Controller
     public function actionIndex()
     {
         $service = SocialFeeds::getInstance()->twitter;
-        if (!$service->activated) {
-            $response = Craft::$app->getResponse();
-            $response->headers->set('Status', 403);
-            return $this->asJson([
-                'status' => 403,
-                'message' => 'Twitter is not activated',
-            ]);
-        }
-
         $limit = Craft::$app->request->getParam('limit', 6);
-        $feed = $service->getFeed($limit);
+        $feed = $service->getFeed($limit, true);
 
         if (array_key_exists('status', $feed)) {
             $response = Craft::$app->getResponse();

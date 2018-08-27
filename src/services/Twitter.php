@@ -53,7 +53,7 @@ class Twitter extends SocialService
     /*
      * @return mixed
      */
-    public function getFeed($limit = 6) : array
+    public function executeLookup($limit = 6) : array
     {
         if (!$this->activated) {
             return [
@@ -69,75 +69,80 @@ class Twitter extends SocialService
 
         if (empty($items)) {
             $items = [];
-            try {
-                $stack = HandlerStack::create();
-                $middleware = new Oauth1([
-                    'consumer_key'    => $this->consumerKey,
-                    'consumer_secret' => $this->consumerSecret,
-                    'token'           => $this->token,
-                    'token_secret'    => $this->tokenSecret,
-                ]);
+            $stack = HandlerStack::create();
+            $middleware = new Oauth1([
+                'consumer_key'    => $this->consumerKey,
+                'consumer_secret' => $this->consumerSecret,
+                'token'           => $this->token,
+                'token_secret'    => $this->tokenSecret,
+            ]);
 
-                $stack->push($middleware);
+            $stack->push($middleware);
 
-                $client = new Client([
-                    'base_uri' => 'https://api.twitter.com/1.1/',
-                    'handler' => $stack,
-                    'auth' => 'oauth',
-                ]);
+            $client = new Client([
+                'base_uri' => 'https://api.twitter.com/1.1/',
+                'handler' => $stack,
+                'auth' => 'oauth',
+            ]);
 
-                $res = $client->get('statuses/user_timeline.json',['query' => [
-                    'screen_name' => $this->screenName,
-                    'count' => $limit,
-                ]]);
+            $res = $client->get('statuses/user_timeline.json',['query' => [
+                'screen_name' => $this->screenName,
+                'count' => $limit,
+            ]]);
 
-                $data = json_decode($res->getBody(), true);
-                foreach ($data as $tweet) {
-                    $items[] = [
-                        'id' => $tweet['id_str'],
-                        'text' => $tweet['text'],
-                        'time' => $tweet['created_at'],
-                        'user' => $tweet['user']['screen_name'],
-                    ];
-                }
-
-                $dependency = new ExpressionDependency([
-                    'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getTwitterStateString() == $this->params["state"]',
-                    'params' => [
-                        'state' => $this->settings->getTwitterStateString(),
-                    ],
-                ]);
-                Craft::$app->cache->set($cacheKey, $items, 600, $dependency);
-            } catch (ClientException $e) {
-                $res = $e->getResponse();
-                $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
-                if (array_key_exists('errors', $data)) {
-                    if (is_array($data['errors'])) {
-                        $error = array_shift($data['errors']);
-                        return array_merge([
-                            'error' => true,
-                            'status' => $res->getStatusCode(),
-                        ], $error);
-                    }
-                    return array_merge([
-                        'error' => true,
-                        'status' => $res->getStatusCode(),
-                    ], $data['errors']);
-                }
-                return [
-                    'error' => true,
-                    'status' => $e->getCode(),
-                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
-                ];
-            } catch (\Exception $e) {
-                return [
-                    'error' => true,
-                    'status' => 500,
-                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+            $data = json_decode($res->getBody(), true);
+            foreach ($data as $tweet) {
+                $items[] = [
+                    'id' => $tweet['id_str'],
+                    'text' => $this->encodeEmojis($tweet['text']),
+                    'time' => $tweet['created_at'],
+                    'user' => $tweet['user']['screen_name'],
                 ];
             }
+
+            $dependency = new ExpressionDependency([
+                'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getTwitterStateString() == $this->params["state"]',
+                'params' => [
+                    'state' => $this->settings->getTwitterStateString(),
+                ],
+            ]);
+            Craft::$app->cache->set($cacheKey, $items, 600, $dependency);
         }
 
         return $items;
+    }
+
+    public function getFeedWithErrors($limit = 6)
+    {
+        try {
+            return $this->executeLookup($limit);
+        } catch (ClientException $e) {
+            $res = $e->getResponse();
+            $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
+            if (array_key_exists('errors', $data)) {
+                if (is_array($data['errors'])) {
+                    $error = array_shift($data['errors']);
+                    return array_merge([
+                        'error' => true,
+                        'status' => $res->getStatusCode(),
+                    ], $error);
+                }
+                return array_merge([
+                    'error' => true,
+                    'status' => $res->getStatusCode(),
+                ], $data['errors']);
+            }
+            return [
+                'error' => true,
+                'status' => $e->getCode(),
+                'message' => Craft::t('apt-social-feeds', 'An error occured'),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'status' => 500,
+                'message' => Craft::t('apt-social-feeds', 'An error occured'),
+            ];
+        }
     }
 }

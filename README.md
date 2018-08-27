@@ -78,7 +78,10 @@ The service has two methods:
 craft.aptSocialFeeds.activated('servicekey')
 ```
 ```
-craft.aptSocialFeeds.feed('servicekey', limit)
+craft.aptSocialFeeds.feed('servicekey', [int limit], [bool error])
+
+limit: number of posts to fetch
+error: should response contain error message
 ```
 
 Service key can be:

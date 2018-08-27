@@ -64,7 +64,7 @@
             </p>
             <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
             <div class="feed">
-<pre><code>{{ plugin.facebook.feed(3)|json_encode|json_prettify }}</code></pre>
+<pre><code>{{ plugin.facebook.feed(3, true)|json_encode|json_prettify }}</code></pre>
             </div>
         </div>
         {% if
@@ -154,7 +154,7 @@
             </p>
             <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
             <div class="feed">
-<pre><code>{{ plugin.youtube.feed(3)|json_encode|json_prettify }}</code></pre>
+<pre><code>{{ plugin.youtube.feed(3, true)|json_encode|json_prettify }}</code></pre>
             </div>
         </div>
         <script>
@@ -257,7 +257,7 @@
             </p>
             <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
             <div class="feed">
-<pre><code>{{ plugin.twitter.feed(3)|json_encode|json_prettify }}</code></pre>
+<pre><code>{{ plugin.twitter.feed(3, true)|json_encode|json_prettify }}</code></pre>
             </div>
         </div>
         {% if
@@ -328,7 +328,7 @@
         </p>
         <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
         <div class="feed">
-<pre><code>{{ plugin.instagram.feed(3)|json_encode|json_prettify }}</code></pre>
+<pre><code>{{ plugin.instagram.feed(3, true)|json_encode|json_prettify }}</code></pre>
         </div>
     </div>
     {% if settings.hasErrors('instagramOn') or settings.hasErrors('instagramId') or settings.hasErrors('instagramToken') %}
@@ -378,7 +378,7 @@
         </p>
         <h3>{{ 'Current feed (limit: 3):'|t('apt-social-feeds') }}</h3>
         <div class="feed">
-<pre><code>{{ plugin.flickr.feed(3)|json_encode|json_prettify }}</code></pre>
+<pre><code>{{ plugin.flickr.feed(3, true)|json_encode|json_prettify }}</code></pre>
         </div>
     </div>
     {% if settings.hasErrors('flickrId') or settings.hasErrors('flickrOn') %}

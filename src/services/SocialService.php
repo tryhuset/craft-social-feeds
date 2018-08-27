@@ -17,12 +17,17 @@ use craft\base\Component;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use LitEmoji\LitEmoji;
 
 interface iSocialService
 {
+    // public function encodeEmojis($string);
     public function getActivated();
     public function isActivated();
-    public function getFeed($limit);
+    public function getFeedWithErrors($limit);
+    // public function getFeedWithoutErrors($limit);
+    // public function getFeed($limit);
+    public function executeLookup($limit);
 }
 
 /**
@@ -38,8 +43,10 @@ abstract class SocialService extends Component implements iSocialService
 
     protected $activated = false;
 
-    // Public Methods
-    // =========================================================================
+    public function encodeEmojis($string) : string
+    {
+        return LitEmoji::encodeShortcode($string);
+    }
 
     public function __construct()
     {
@@ -56,5 +63,22 @@ abstract class SocialService extends Component implements iSocialService
     public function isActivated() : bool
     {
         return $this->getActivated();
+    }
+
+    public function getFeedWithoutErrors($limit)
+    {
+        try {
+            return $this->executeLookup($limit);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    public function getFeed($limit = 6, $errors = false)
+    {
+        if ($errors) {
+            return $this->getFeedWithErrors($limit);
+        }
+        return $this->getFeedWithoutErrors($limit);
     }
 }

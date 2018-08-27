@@ -46,7 +46,7 @@ class Instagram extends SocialService
     /*
      * @return mixed
      */
-    public function getFeed($limit = 6) : array
+    public function executeLookup($limit = 6) : array
     {
         if (!$this->activated) {
             return [
@@ -62,59 +62,64 @@ class Instagram extends SocialService
 
         if (empty($items)) {
             $items = [];
-            try {
-                $client = new Client([
-                    'base_uri' => 'https://api.instagram.com/v1/',
-                ]);
+            $client = new Client([
+                'base_uri' => 'https://api.instagram.com/v1/',
+            ]);
 
-                $res = $client->get("users/{$this->id}/media/recent", ['query' => [
-                    'access_token' => $this->token,
-                    'count' => $limit,
-                ]]);
-                $data = json_decode($res->getBody(), true);
-                foreach ($data['data'] as $item) {
-                    $items[] = [
-                        'id' => $item['id'],
-                        'time' => date('c', $item['created_time']),
-                        'title' => $item['caption']['text'],
-                        'link' => $item['link'],
-                        'image' => $item['images']['low_resolution']['url'],
-                    ];
-                }
-                $dependency = new ExpressionDependency([
-                    'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getInstagramStateString() == $this->params["state"]',
-                    'params' => [
-                        'state' => $this->settings->getInstagramStateString(),
-                    ],
-                ]);
-                Craft::$app->cache->set($cacheKey, $items, 600);
-            } catch (ClientException $e) {
-                $res = $e->getResponse();
-                $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
-                if (array_key_exists('meta', $data)) {
-                    return [
-                        'error' => true,
-                        'status' => $res->getStatusCode(),
-                        'code' => $data['meta']['code'],
-                        'type' => $data['meta']['error_type'],
-                        'message' => $data['meta']['error_message'],
-                    ];
-                }
-                return [
-                    'error' => true,
-                    'status' => $e->getCode(),
-                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
-                ];
-            } catch (\Exception $e) {
-                return [
-                    'error' => true,
-                    'status' => 500,
-                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
+            $res = $client->get("users/{$this->id}/media/recent", ['query' => [
+                'access_token' => $this->token,
+                'count' => $limit,
+            ]]);
+            $data = json_decode($res->getBody(), true);
+            foreach ($data['data'] as $item) {
+                $items[] = [
+                    'id' => $item['id'],
+                    'time' => date('c', $item['created_time']),
+                    'title' => $this->encodeEmojis($item['caption']['text']),
+                    'link' => $item['link'],
+                    'image' => $item['images']['low_resolution']['url'],
                 ];
             }
+            $dependency = new ExpressionDependency([
+                'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getInstagramStateString() == $this->params["state"]',
+                'params' => [
+                    'state' => $this->settings->getInstagramStateString(),
+                ],
+            ]);
+            Craft::$app->cache->set($cacheKey, $items, 600);
         }
 
 
         return $items;
+    }
+
+    public function getFeedWithErrors($limit = 6)
+    {
+        try {
+            return $this->executeLookup($limit);
+        } catch (ClientException $e) {
+            $res = $e->getResponse();
+            $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
+            if (array_key_exists('meta', $data)) {
+                return [
+                    'error' => true,
+                    'status' => $res->getStatusCode(),
+                    'code' => $data['meta']['code'],
+                    'type' => $data['meta']['error_type'],
+                    'message' => $data['meta']['error_message'],
+                ];
+            }
+            return [
+                'error' => true,
+                'status' => $e->getCode(),
+                'message' => Craft::t('apt-social-feeds', 'An error occured'),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'status' => 500,
+                'message' => Craft::t('apt-social-feeds', 'An error occured'),
+            ];
+        }
     }
 }

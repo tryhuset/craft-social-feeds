@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3acb12dc54e18b574cd2145f79f8c40a",
+    "content-hash": "a2b68d8aec8a4c92ce928441cfefc26f",
     "packages": [
         {
             "name": "camspiers/json-pretty",
@@ -775,23 +775,23 @@
         },
         {
             "name": "elvanto/litemoji",
-            "version": "1.4.0",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/elvanto/litemoji.git",
-                "reference": "7c0276dd0e5004bc78b7865e12030f3d2b6b8d0e"
+                "reference": "af94de6becfbc2f4d9c52e1142183146fd087f36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/elvanto/litemoji/zipball/7c0276dd0e5004bc78b7865e12030f3d2b6b8d0e",
-                "reference": "7c0276dd0e5004bc78b7865e12030f3d2b6b8d0e",
+                "url": "https://api.github.com/repos/elvanto/litemoji/zipball/af94de6becfbc2f4d9c52e1142183146fd087f36",
+                "reference": "af94de6becfbc2f4d9c52e1142183146fd087f36",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4"
             },
             "require-dev": {
-                "milesj/emojibase": "*",
+                "milesj/emojibase": "2.0.0",
                 "phpunit/phpunit": "^5.0"
             },
             "type": "library",
@@ -809,7 +809,7 @@
                 "emoji",
                 "php-emoji"
             ],
-            "time": "2018-05-25T04:37:05+00:00"
+            "time": "2018-08-02T03:48:08+00:00"
         },
         {
             "name": "enshrined/svg-sanitize",

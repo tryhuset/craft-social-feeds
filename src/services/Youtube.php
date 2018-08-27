@@ -78,7 +78,7 @@ class Youtube extends SocialService
     /*
      * @return mixed
      */
-    public function getFeed($limit = 6)
+    public function executeLookup($limit = 6)
     {
         if (!$this->activated) {
             return [
@@ -98,65 +98,71 @@ class Youtube extends SocialService
 
         if (empty($items)) {
             $items = [];
-            try {
-                $client = new Client([
-                    'base_uri' => 'https://www.googleapis.com/youtube/v3/',
-                ]);
+            $client = new Client([
+                'base_uri' => 'https://www.googleapis.com/youtube/v3/',
+            ]);
 
-                $playlistId = $this->getPlaylistId();
+            $playlistId = $this->getPlaylistId();
 
-                if ($playlistId) {
-                    $res = $client->get('playlistItems', ['query' => [
-                        'part' => 'snippet',
-                        'maxResults' => $limit,
-                        'playlistId' => $playlistId,
-                        'key' => $this->key,
-                    ]]);
+            if ($playlistId) {
+                $res = $client->get('playlistItems', ['query' => [
+                    'part' => 'snippet',
+                    'maxResults' => $limit,
+                    'playlistId' => $playlistId,
+                    'key' => $this->key,
+                ]]);
 
-                    $data = json_decode($res->getBody(), true);
+                $data = json_decode($res->getBody(), true);
 
-                    foreach ($data['items'] as $item) {
-                        $id = $item['snippet']['resourceId']['videoId'];
-                        $items[] = [
-                            'id' => $id,
-                            'time' => $item['snippet']['publishedAt'],
-                            'title' => $item['snippet']['title'],
-                            'link' => "https://www.youtube.com/watch?v=$id",
-                            'image' => $item['snippet']['thumbnails']['high']['url'],
-                        ];
-                    }
+                foreach ($data['items'] as $item) {
+                    $id = $item['snippet']['resourceId']['videoId'];
+                    $items[] = [
+                        'id' => $id,
+                        'time' => $item['snippet']['publishedAt'],
+                        'title' => $this->encodeEmojis($item['snippet']['title']),
+                        'description' => $this->encodeEmojis($item['snippet']['description']),
+                        'link' => "https://www.youtube.com/watch?v=$id",
+                        'image' => $item['snippet']['thumbnails']['high']['url'],
+                    ];
                 }
-
-                $dependency = new ExpressionDependency([
-                    'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getYoutubeStateString() == $this->params["state"]',
-                    'params' => [
-                        'state' => $this->settings->getYoutubeStateString(),
-                    ],
-                ]);
-                Craft::$app->cache->set($cacheKey, $items, 600, $dependency);
-            } catch (ClientException $e) {
-                $res = $e->getResponse();
-                $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
-                if (array_key_exists('error', $data)) {
-                    return array_merge([
-                        'error' => true,
-                        'status' => $res->getStatusCode(),
-                    ], $data['error']);
-                }
-                return [
-                    'error' => true,
-                    'status' => $e->getCode(),
-                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
-                ];
-            } catch (\Exception $e) {
-                return [
-                    'error' => true,
-                    'status' => 500,
-                    'message' => Craft::t('apt-social-feeds', 'An error occured'),
-                ];
             }
+
+            $dependency = new ExpressionDependency([
+                'expression' => 'apt\\socialfeeds\\SocialFeeds::$plugin->getSettings()->getYoutubeStateString() == $this->params["state"]',
+                'params' => [
+                    'state' => $this->settings->getYoutubeStateString(),
+                ],
+            ]);
+            Craft::$app->cache->set($cacheKey, $items, 600, $dependency);
         }
 
         return $items;
+    }
+
+    public function getFeedWithErrors($limit = 6)
+    {
+        try {
+            return $this->executeLookup($limit);
+        } catch (ClientException $e) {
+            $res = $e->getResponse();
+            $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
+            if (array_key_exists('error', $data)) {
+                return array_merge([
+                    'error' => true,
+                    'status' => $res->getStatusCode(),
+                ], $data['error']);
+            }
+            return [
+                'error' => true,
+                'status' => $e->getCode(),
+                'message' => Craft::t('apt-social-feeds', 'An error occured'),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'status' => 500,
+                'message' => Craft::t('apt-social-feeds', 'An error occured'),
+            ];
+        }
     }
 }

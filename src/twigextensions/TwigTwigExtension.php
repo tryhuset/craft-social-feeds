@@ -12,7 +12,7 @@ namespace apt\socialfeeds\twigextensions;
 
 use apt\twig\Twig;
 use Camspiers\JsonPretty\JsonPretty;
-
+use LitEmoji\LitEmoji;
 use Craft;
 
 /**
@@ -42,6 +42,9 @@ class TwigTwigExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFilter('json_prettify', [$this, 'jsonPrettify']),
+            new \Twig_SimpleFilter('emoji_shortcode', [$this, 'emojiShortcode']),
+            new \Twig_SimpleFilter('emoji_html', [$this, 'emojiHTML']),
+            new \Twig_SimpleFilter('emoji_unicode', [$this, 'emojiUnicode']),
         ];
     }
 
@@ -53,5 +56,35 @@ class TwigTwigExtension extends \Twig_Extension
     public function jsonPrettify($json)
     {
         return $this->prettifier->prettify($json);
+    }
+
+    /**
+     * @param null $text
+     *
+     * @return string
+     */
+    public function emojiShortcode($text)
+    {
+        return LitEmoji::encodeShortcode($text);
+    }
+
+    /**
+     * @param null $text
+     *
+     * @return string
+     */
+    public function emojiHTML($text)
+    {
+        return LitEmoji::encodeHtml($text);
+    }
+
+    /**
+     * @param null $text
+     *
+     * @return string
+     */
+    public function emojiUnicode($text)
+    {
+        return LitEmoji::encodeUnicode($text);
     }
 }

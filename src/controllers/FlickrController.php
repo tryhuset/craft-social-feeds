@@ -14,6 +14,7 @@ use apt\socialfeeds\SocialFeeds;
 
 use Craft;
 use craft\web\Controller;
+use GuzzleHttp\Exception\ClientException;
 
 /**
  * @author    Thomas Sømoen
@@ -42,23 +43,14 @@ class FlickrController extends Controller
     public function actionIndex()
     {
         $service = SocialFeeds::getInstance()->flickr;
-        if (!$service->activated) {
-            $response = Craft::$app->getResponse();
-            $response->headers->set('Status', 403);
-            return $this->asJson([
-                'status' => 403,
-                'message' => 'Flickr is not activated',
-            ]);
-        }
-
         $limit = Craft::$app->request->getParam('limit', 6);
-        $feed = $service->getFeed($limit);
+        $result = $service->getFeed($limit, true);
 
-        if (array_key_exists('status', $feed)) {
+        if (array_key_exists('error', $result)) {
             $response = Craft::$app->getResponse();
-            $response->headers->set('Status', $feed['status']);
+            $response->headers->set('Status', $result['status']);
         }
 
-        return $this->asJson($feed);
+        return $this->asJson($result);
     }
 }
