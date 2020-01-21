@@ -70,8 +70,9 @@ class SocialFeeds extends Plugin
         $this->setComponents([
             'facebook' => new services\Facebook([
                 'activated' => ($this->settings->facebook && $this->settings->facebookOn),
-                'appId' => $this->settings->facebookAppId,
-                'appSecret'=> $this->settings->facebookAppSecret,
+                //'appId' => $this->settings->facebookAppId,
+                //'appSecret'=> $this->settings->facebookAppSecret,
+                'accessToken' => $this->settings->facebookAccessToken,
                 'pageId' => $this->settings->facebookPageId,
                 'cache' => Craft::$app->cache,
                 'state' => $this->settings->getFacebookStateString(),

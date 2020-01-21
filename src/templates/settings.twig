@@ -32,6 +32,7 @@
             on: settings['facebookOn'],
             errors: settings.getErrors('facebookOn'),
         }) }}
+        {#
         {{ forms.textField({
             label: 'App Id'|t('apt-social-feeds'),
             id: 'facebook-app-id',
@@ -46,12 +47,20 @@
             value: settings['facebookAppSecret'],
             errors: settings.getErrors('facebookAppSecret'),
         }) }}
+        #}
         {{ forms.textField({
             label: 'Page id'|t('apt-social-feeds'),
             id: 'facebook-page-id',
             name: 'facebookPageId',
             value: settings['facebookPageId'],
             errors: settings.getErrors('facebookPageId'),
+        }) }}
+        {{ forms.textField({
+            label: 'AccessToken'|t('apt-social-feeds'),
+            id: 'facebook-access-token',
+            name: 'facebookAccessToken',
+            value: settings['facebookAccessToken'],
+            errors: settings.getErrors('facebookAccessToken'),
         }) }}
         <div class="field">
             <strong>{{ 'Url to the feed:'|t('apt-social-feeds') }}</strong> <a href="{{ siteUrl }}actions/apt-social-feeds/facebook" target="_blank" rel="nofollow noreferrer noopener">{{ siteUrl }}actions/apt-social-feeds/facebook</a>

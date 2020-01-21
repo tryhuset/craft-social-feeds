@@ -31,6 +31,8 @@ class Facebook extends SocialService
 
     protected $pageId;
 
+    protected $accessToken;
+
     /*
      * @return mixed
      */
@@ -43,9 +45,14 @@ class Facebook extends SocialService
             ];
         }
 
-        $query = [
+        /* $query = [
             'access_token' => "{$this->appId}|{$this->appSecret}",
             'fields' => 'story,message,attachments,link,created_time',
+        ]; */
+
+        $query = [
+            'access_token' => "{$this->accessToken}",
+            'fields' => 'message,attachments,created_time',
         ];
 
         if ($limit) {
@@ -65,7 +72,7 @@ class Facebook extends SocialService
             $client = $this->getClient([
                 'base_uri' => 'https://graph.facebook.com/',
             ]);
-            $res = $client->get("{$this->pageId}/posts", ['query' => $query]);
+            $res = $client->get("{$this->pageId}/feed", ['query' => $query]);
             $data = json_decode($res->getBody(), JSON_UNESCAPED_UNICODE);
 
             foreach ($data['data'] as $item) {

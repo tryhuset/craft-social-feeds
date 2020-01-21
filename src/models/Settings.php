@@ -58,6 +58,7 @@ class Settings extends Model
     public $facebookOn = false;
     public $facebookAppId = '';
     public $facebookAppSecret = '';
+    public $facebookAccessToken = '';
     public $facebookPageId = '';
 
 
@@ -187,13 +188,16 @@ class Settings extends Model
             ['facebookAppSecret', 'default', 'value' => ''],
             ['facebookPageId', 'string'],
             ['facebookPageId', 'default', 'value' => ''],
+            ['facebookAccessToken', 'string'],
+            ['facebookAccessToken', 'default', 'value' => ''],
         ];
 
         if ($this->facebookOn) {
             $rules = array_merge($rules, [
-                ['facebookAppId', 'required'],
-                ['facebookAppSecret', 'required'],
+                //['facebookAppId', 'required'],
+                //['facebookAppSecret', 'required'],
                 ['facebookPageId', 'required'],
+                ['facebookAccessToken', 'required'],
             ]);
         }
 
@@ -240,6 +244,7 @@ class Settings extends Model
 
     public function getFacebookStateString()
     {
-        return "{$this->facebookAppId}_{$this->facebookAppSecret}_{$this->facebookPageId}";
+        return "{$this->facebookAccessToken}_{$this->facebookPageId}";
+        //return "{$this->facebookAppId}_{$this->facebookAppSecret}_{$this->facebookPageId}";
     }
 }
