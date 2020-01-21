@@ -2,7 +2,7 @@
     "name": "apt/craft-social-feeds",
     "description": "Utilizes json api to get latest social feeds",
     "type": "craft-plugin",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "keywords": [
         "craft",
         "cms",
