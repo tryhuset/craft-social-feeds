@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2018 Thomas Sømoen
  */
 
-namespace apt\socialfeeds\assetbundles\SocialFeeds;
+namespace apt\socialfeeds\assetbundles\socialfeeds;
 
 use Craft;
 use craft\web\AssetBundle;
