@@ -4,17 +4,18 @@ Utilizes json api to get latest social feeds
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugin requires Craft CMS 4.
 
 ## Installation
 
 To install the plugin, follow these instructions.
 
-1. Open your terminal and go to your Craft project:
+1.  Open your terminal and go to your Craft project:
 
         cd /path/to/project
 
-2. Add the following to `composer.json`
+2.  Add the following to `composer.json`
+
 ```
 "repositories": [
     {
@@ -24,22 +25,23 @@ To install the plugin, follow these instructions.
   ],
 ```
 
-3. Then tell Composer to load the plugin:
+3.  Then tell Composer to load the plugin:
 
         composer require apt/craft-social-feeds
 
-4. In the Control Panel, go to Settings → Plugins and click the “Install” button for Social feeds.
+4.  In the Control Panel, go to Settings → Plugins and click the “Install” button for Social feeds.
 
 ## Social feeds Overview
 
 Adds api to fetch social feeds as JSON.
 
 The plugin can feed from
-* Facebook
-* Youtube
-* Instagram
-* Twitter
-* Flickr
+
+- Facebook
+- Youtube
+- Instagram
+- Twitter
+- Flickr
 
 The individual feeds must be activated through the plugin settings.
 
@@ -77,6 +79,7 @@ The service has two methods:
 ```
 craft.aptSocialFeeds.activated('servicekey')
 ```
+
 ```
 craft.aptSocialFeeds.feed('servicekey', [int limit], [bool error])
 
@@ -85,14 +88,15 @@ error: should response contain error message
 ```
 
 Service key can be:
-* 'facebook'
-* 'youtube'
-* 'instagram'
-* 'twitter'
-* 'flickr'
+
+- 'facebook'
+- 'youtube'
+- 'instagram'
+- 'twitter'
+- 'flickr'
 
 Limit is an integer and limits the number of items in the feed.<br />
-*If omitted it will return 6.*
+_If omitted it will return 6._
 
 function activated returns true if service is activated.<br />
 function feed return the feed as an array
@@ -101,11 +105,11 @@ function feed return the feed as an array
 
 When activated the feeds can be accessed by the following url:
 
-* /actions/apt-social-feeds/facebook
-* /actions/apt-social-feeds/youtube
-* /actions/apt-social-feeds/instagram
-* /actions/apt-social-feeds/twitter
-* /actions/apt-social-feeds/flickr
+- /actions/apt-social-feeds/facebook
+- /actions/apt-social-feeds/youtube
+- /actions/apt-social-feeds/instagram
+- /actions/apt-social-feeds/twitter
+- /actions/apt-social-feeds/flickr
 
 The feeds has a default limit of 6.
 If you need more add ?limit=[your limit] to the query string
@@ -121,6 +125,7 @@ If you need more add ?limit=[your limit] to the query string
 ```
 
 #### In php
+
 ```
 use apt\socialfeeds\SocialFeeds;
 
@@ -141,6 +146,5 @@ $service->twitter->getFeed($limit);
 $service->flickr->isActivated();
 $service->flickr->getFeed($limit);
 ```
-
 
 Brought to you by [Thomas Sømoen](https://apt.no/)
