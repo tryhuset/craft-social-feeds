@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Social feeds plugin for Craft CMS 3.x
  *
@@ -62,7 +63,7 @@ class Settings extends Model
     public $facebookPageId = '';
 
 
-    public function __construct($config = null)
+    public function __construct($config = [])
     {
         unset($config['facebookAccessToken']);
         parent::__construct($config);
