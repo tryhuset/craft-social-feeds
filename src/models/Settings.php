@@ -207,7 +207,7 @@ class Settings extends Model
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         $global = [
             [['facebook', 'youtube', 'instagram', 'flickr'], 'boolean'],

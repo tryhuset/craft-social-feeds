@@ -24,7 +24,8 @@
     "php": "^8.0.2"
   },
   "require-dev": {
-    "phpunit/phpunit": "^10"
+    "phpunit/phpunit": "^10",
+    "craftcms/rector": "dev-main"
   },
   "autoload": {
     "psr-4": {
@@ -37,5 +38,7 @@
     "hasCpSettings": true,
     "hasCpSection": false,
     "class": "apt\\socialfeeds\\SocialFeeds"
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

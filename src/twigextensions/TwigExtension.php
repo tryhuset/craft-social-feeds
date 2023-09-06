@@ -26,7 +26,7 @@ use Craft;
  * @package   Twig
  * @since     1.0.0
  */
-class TwigExtension extends \Twig_Extension
+class TwigExtension extends \Twig\Extension\AbstractExtension
 {
     public function __construct()
     {
@@ -41,10 +41,10 @@ class TwigExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('json_prettify', [$this, 'jsonPrettify']),
-            new \Twig_SimpleFilter('emoji_shortcode', [$this, 'emojiShortcode']),
-            new \Twig_SimpleFilter('emoji_html', [$this, 'emojiHTML']),
-            new \Twig_SimpleFilter('emoji_unicode', [$this, 'emojiUnicode']),
+            new \Twig\TwigFilter('json_prettify', [$this, 'jsonPrettify']),
+            new \Twig\TwigFilter('emoji_shortcode', [$this, 'emojiShortcode']),
+            new \Twig\TwigFilter('emoji_html', [$this, 'emojiHTML']),
+            new \Twig\TwigFilter('emoji_unicode', [$this, 'emojiUnicode']),
         ];
     }
 

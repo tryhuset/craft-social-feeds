@@ -32,7 +32,7 @@ class FlickrController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['index'];
+    protected array|int|bool $allowAnonymous = ['index'];
 
     // Public Methods
     // =========================================================================
