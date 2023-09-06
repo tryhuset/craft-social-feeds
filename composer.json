@@ -1,40 +1,41 @@
 {
-    "name": "apt/craft-social-feeds",
-    "description": "Utilizes json api to get latest social feeds",
-    "type": "craft-plugin",
-    "version": "2.0.2",
-    "keywords": [
-        "craft",
-        "cms",
-        "craftcms",
-        "craft-plugin",
-        "social feeds"
-    ],
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Thomas Sømoen",
-            "homepage": "https://apt.no/"
-        }
-    ],
-    "require": {
-        "craftcms/cms": "3.*",
-        "guzzlehttp/oauth-subscriber": "^0.3",
-        "camspiers/json-pretty": "^1.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "6.5.8"
-    },
-    "autoload": {
-        "psr-4": {
-          "apt\\socialfeeds\\": "src/"
-        }
-    },
-    "extra": {
-        "name": "Social feeds",
-        "handle": "apt-social-feeds",
-        "hasCpSettings": true,
-        "hasCpSection": false,
-        "class": "apt\\socialfeeds\\SocialFeeds"
+  "name": "apt/craft-social-feeds",
+  "description": "Utilizes json api to get latest social feeds",
+  "type": "craft-plugin",
+  "version": "2.0.2",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "craft-plugin",
+    "social feeds"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thomas Sømoen",
+      "homepage": "https://apt.no/"
     }
+  ],
+  "require": {
+    "craftcms/cms": "^4.0.0",
+    "guzzlehttp/oauth-subscriber": "^0.6",
+    "camspiers/json-pretty": "^1.0",
+    "php": "^8.0.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10"
+  },
+  "autoload": {
+    "psr-4": {
+      "apt\\socialfeeds\\": "src/"
+    }
+  },
+  "extra": {
+    "name": "Social feeds",
+    "handle": "apt-social-feeds",
+    "hasCpSettings": true,
+    "hasCpSection": false,
+    "class": "apt\\socialfeeds\\SocialFeeds"
+  }
 }
