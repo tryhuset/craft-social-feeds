@@ -1,10 +1,10 @@
-# Social feeds plugin for Craft CMS 3.x
+# Social feeds plugin for Craft CMS 5.x
 
 Utilizes json api to get latest social feeds
 
 ## Requirements
 
-This plugin requires Craft CMS 4.
+This plugin requires Craft CMS 5.
 
 ## Installation
 
