@@ -2,7 +2,7 @@
   "name": "apt/craft-social-feeds",
   "description": "Utilizes json api to get latest social feeds",
   "type": "craft-plugin",
-  "version": "4.0.0",
+  "version": "4.1",
   "keywords": [
     "craft",
     "cms",
@@ -19,8 +19,7 @@
   ],
   "require": {
     "craftcms/cms": "^5.0.0",
-    "guzzlehttp/oauth-subscriber": "^0.6",
-    "camspiers/json-pretty": "^1.0",
+    "guzzlehttp/oauth-subscriber": "^0.8.1",
     "php": "^8.0.2"
   },
   "require-dev": {

@@ -11,7 +11,6 @@
 namespace apt\socialfeeds\twigextensions;
 
 use apt\twig\Twig;
-use Camspiers\JsonPretty\JsonPretty;
 use LitEmoji\LitEmoji;
 use Craft;
 
@@ -28,11 +27,6 @@ use Craft;
  */
 class TwigExtension extends \Twig\Extension\AbstractExtension
 {
-    public function __construct()
-    {
-        $this->prettifier = new JsonPretty();
-    }
-
     public function getName()
     {
         return 'Twig';
@@ -55,7 +49,13 @@ class TwigExtension extends \Twig\Extension\AbstractExtension
 
     public function jsonPrettify($json)
     {
-        return $this->prettifier->prettify($json);
+        if (is_string($json)) {
+            $decoded = json_decode($json, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            }
+        }
+        return json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**
