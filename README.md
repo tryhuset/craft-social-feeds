@@ -20,7 +20,7 @@ To install the plugin, follow these instructions.
 "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/tryhuset/craft-social-feeds.git"
+      "url": "https://github.com/tryhuset/craft-social-feeds"
     }
   ],
 ```
