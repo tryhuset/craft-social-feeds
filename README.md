@@ -20,7 +20,7 @@ To install the plugin, follow these instructions.
 "repositories": [
     {
       "type": "vcs",
-      "url": "https://git1.apt.no/open/craft-social-feeds.git"
+      "url": "https://github.com/tryhuset/craft-social-feeds.git"
     }
   ],
 ```
@@ -147,4 +147,4 @@ $service->flickr->isActivated();
 $service->flickr->getFeed($limit);
 ```
 
-Brought to you by [Thomas Sømoen](https://apt.no/)
+Brought to you by [Thomas Sømoen](https://try.no/)
