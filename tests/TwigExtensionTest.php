@@ -12,7 +12,7 @@ class TwigExtensionTest extends \PHPUnit\Framework\TestCase
         $json = json_encode(['foo' => 'bar']);
         $extension = new TwigExtension;
         $this->assertStringStartsWith(
-            "{\r\n",
+            "{\n",
             $extension->jsonPrettify($json)
         );
     }
@@ -24,7 +24,7 @@ class TwigExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $extension = new TwigExtension;
         $this->assertEquals(
-            ":grinning:",
+            ":grinning_face:",
             $extension->emojiShortcode('😀')
         );
     }
