@@ -1,12 +1,11 @@
 <?php
 
 use apt\socialfeeds\twigextensions\TwigExtension;
+use PHPUnit\Framework\Attributes\Test;
 
 class TwigExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function json_prettify()
     {
         $json = json_encode(['foo' => 'bar']);
@@ -17,9 +16,7 @@ class TwigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function emoji_shortcode()
     {
         $extension = new TwigExtension;
@@ -29,9 +26,7 @@ class TwigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function emoji_html()
     {
         $extension = new TwigExtension;
@@ -41,9 +36,7 @@ class TwigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function emoji_unicode()
     {
         $extension = new TwigExtension;

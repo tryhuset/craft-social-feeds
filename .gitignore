@@ -14,6 +14,7 @@
 
 # MISC FILES
 .cache
+.phpunit.cache
 .phpunit.result.cache
 .DS_Store
 .idea
